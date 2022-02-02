@@ -59,5 +59,5 @@ add_executable(fuzz_message
 )
 
 target_include_directories(fuzz_message PUBLIC ../src)
-target_compile_options(fuzz_message PUBLIC -fsanitize=fuzzer,address,undefined)
-target_link_options(fuzz_message PUBLIC -fsanitize=fuzzer,address,undefined)
+target_compile_options(fuzz_message PUBLIC -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=undefined)
+target_link_options(fuzz_message PUBLIC -fsanitize=fuzzer,address,undefined -fno-sanitize-recover=undefined)
