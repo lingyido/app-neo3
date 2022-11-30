@@ -2,3 +2,7 @@ pytest>=6.1.1,<7.0.0
 ledgercomm>=1.1.0,<1.2.0
 ecdsa>=0.16.1,<0.17.0
 neo-mamba==0.9.3
+pytest
+ragger[speculos]
+ragger[ledgerwallet]
+protobuf==3.20.3

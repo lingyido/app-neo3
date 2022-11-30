@@ -25,6 +25,8 @@ __pycache__/
 *.egg-info/
 .eggs/
 .python-version
+tests/elfs/
+tests/snapshots-tmp/
 
 # Doxygen
 doc/html
