@@ -1,5 +1,5 @@
-from boilerplate_client.boilerplate_cmd import BoilerplateCommand
+from apps.neo_n3_cmd import Neo_n3_Command
 
 def test_version(backend, firmware):
-    client = BoilerplateCommand(backend)
+    client = Neo_n3_Command(backend)
     assert client.get_version() == (0, 2, 0)

@@ -4,8 +4,11 @@ import enum
 import struct
 import logging
 
-from boilerplate_client.boilerplate_cmd import BoilerplateCommand
-from boilerplate_client.exception import errors, DeviceException
+from apps.neo_n3_cmd import Neo_n3_Command
+from apps.neo_n3_cmd_builder import InsType, Neo_n3_CommandBuilder
+from apps.exception import errors, DeviceException
+from apps.utils import bip44_path_from_string
+
 from ragger.backend.interface import BackendInterface, RAPDU
 from ragger.backend import RaisePolicy
 
@@ -13,10 +16,8 @@ from neo3.network.payloads import WitnessScope, Transaction, Signer, HighPriorit
 from neo3.core import types, serialization
 
 from pathlib import Path
-from boilerplate_client.utils import bip44_path_from_string
-from boilerplate_client.boilerplate_cmd_builder import InsType, BoilerplateCommandBuilder
 
-CLA = BoilerplateCommandBuilder.CLA
+CLA = Neo_n3_CommandBuilder.CLA
 bip44_path: str = "m/44'/888'/0'/0/0"
 network_magic = 123  # actual value doesn't matter
 

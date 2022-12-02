@@ -1,6 +1,6 @@
 from ragger.backend import RaisePolicy
 
-from boilerplate_client.exception import errors, DeviceException
+from apps.exception import errors, DeviceException
 
 
 def test_bad_cla(backend, firmware):

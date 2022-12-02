@@ -3,21 +3,19 @@ from typing import Tuple, Generator
 from contextlib import contextmanager
 
 from ragger.backend.interface import BackendInterface, RAPDU
-from ragger.error import ExceptionRAPDU
 
-from boilerplate_client.boilerplate_cmd_builder import BoilerplateCommandBuilder, InsType
-from boilerplate_client.button import Button
-from boilerplate_client.exception import DeviceException
-from boilerplate_client.transaction import Transaction
+from .neo_n3_cmd_builder import Neo_n3_CommandBuilder, InsType
+
+from .transaction import Transaction
 from neo3.network import payloads
 
 
-class BoilerplateCommand:
+class Neo_n3_Command:
     def __init__(self,
                  backend: BackendInterface,
                  debug: bool = False) -> None:
         self.backend = backend
-        self.builder = BoilerplateCommandBuilder(debug=debug)
+        self.builder = Neo_n3_CommandBuilder(debug=debug)
         self.debug = debug
 
     def get_app_and_version(self) -> Tuple[str, str]:

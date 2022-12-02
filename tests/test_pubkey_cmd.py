@@ -1,8 +1,8 @@
 from neo3crypto import ECCCurve, ECPoint
-from boilerplate_client.boilerplate_cmd import BoilerplateCommand
+from apps.neo_n3_cmd import Neo_n3_Command
 
 def test_get_public_key(backend, firmware):
-    client = BoilerplateCommand(backend)
+    client = Neo_n3_Command(backend)
     pub_key = client.get_public_key(
         bip44_path="m/44'/888'/0'/0/0",
         display=False

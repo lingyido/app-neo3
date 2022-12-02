@@ -2,7 +2,7 @@ import struct
 from hashlib import sha256
 from pathlib import Path
 
-from boilerplate_client.boilerplate_cmd import BoilerplateCommand
+from apps.neo_n3_cmd import Neo_n3_Command
 
 from ecdsa.curves import NIST256p
 from ecdsa.keys import VerifyingKey
@@ -17,18 +17,9 @@ from ragger.navigator import NavInsID, NavIns
 
 ROOT_SCREENSHOT_PATH = Path(__file__).parent.resolve()
 
-from time import sleep
 def test_sign_tx(backend, firmware, navigator, test_name):
-    client = BoilerplateCommand(backend)
-    """
-    In order to debug this test locally while being able to see what's happening in the app
-    run Speculos as follows:
+    client = Neo_n3_Command(backend)
 
-    ./speculos.py --sdk 2.0 --ontop --button-port 42000 ../app-neo3/bin/app.elf
-
-    Then in PyCharm add "--headless" as Additional Argument for the testcase.
-    This will make sure it selects TCPButton instead of a fake button that does nothing.
-    """
     bip44_path: str = "m/44'/888'/0'/0/0"
 
     pub_key = client.get_public_key(
@@ -133,7 +124,7 @@ def test_sign_tx(backend, firmware, navigator, test_name):
 
 
 def test_sign_vote_script_tx(backend, firmware, navigator, test_name):
-    client = BoilerplateCommand(backend)
+    client = Neo_n3_Command(backend)
 
     bip44_path: str = "m/44'/888'/0'/0/0"
 

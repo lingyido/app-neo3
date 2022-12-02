@@ -3,7 +3,7 @@ import logging
 import struct
 from typing import List, Tuple, Union, Iterator, cast
 
-from boilerplate_client.utils import bip44_path_from_string
+from .utils import bip44_path_from_string
 from neo3.network import node, payloads
 from neo3.core import serialization
 
@@ -36,8 +36,8 @@ class InsType(enum.IntEnum):
     INS_GET_PUBLIC_KEY = 0x04
 
 
-class BoilerplateCommandBuilder:
-    """APDU command builder for the Boilerplate application.
+class Neo_n3_CommandBuilder:
+    """APDU command builder for the Neo_n3 application.
 
     Parameters
     ----------
