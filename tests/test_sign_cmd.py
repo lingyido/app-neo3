@@ -1,5 +1,8 @@
 import struct
 from hashlib import sha256
+from pathlib import Path
+
+from apps.neo_n3_cmd import Neo_n3_Command
 
 from ecdsa.curves import NIST256p
 from ecdsa.keys import VerifyingKey
@@ -9,20 +12,17 @@ from neo3.network import node, payloads
 from neo3.core import types, serialization
 from neo3 import contracts, wallet, vm
 
+from utils import create_simple_nav_instructions
+from ragger.navigator import NavInsID, NavIns
 
-def test_sign_tx(cmd, button):
-    """
-    In order to debug this test locally while being able to see what's happening in the app
-    run Speculos as follows:
+ROOT_SCREENSHOT_PATH = Path(__file__).parent.resolve()
 
-    ./speculos.py --sdk 2.0 --ontop --button-port 42000 ../app-neo3/bin/app.elf
+def test_sign_tx(backend, firmware, navigator, test_name):
+    client = Neo_n3_Command(backend)
 
-    Then in PyCharm add "--headless" as Additional Argument for the testcase.
-    This will make sure it selects TCPButton instead of a fake button that does nothing.
-    """
     bip44_path: str = "m/44'/888'/0'/0/0"
 
-    pub_key = cmd.get_public_key(
+    pub_key = client.get_public_key(
         bip44_path=bip44_path,
         display=False
     )  # type: bytes
@@ -49,7 +49,6 @@ def test_sign_tx(cmd, button):
     data = None
     sb = vm.ScriptBuilder()
     sb.emit_dynamic_call_with_args(contracts.NeoToken().hash, "transfer", [from_account, to_account, amount, data])
-
     tx = payloads.Transaction(version=0,
                               nonce=123,
                               system_fee=456,
@@ -60,10 +59,59 @@ def test_sign_tx(cmd, button):
                               script=sb.to_array(),
                               witnesses=[witness])
 
-    der_sig = cmd.sign_tx(bip44_path=bip44_path,
-                          transaction=tx,
-                          network_magic=magic,
-                          button=button)
+    with client.sign_tx(bip44_path=bip44_path,
+                        transaction=tx,
+                        network_magic=magic):
+        nav_ins = []
+        # Review Transaction
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Destination address
+        if backend.firmware.device == "nanos":
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        else:
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Token Amount
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Target network
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # System fee
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Network fee
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Total fees
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Valid until
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Signer 1 of 1
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Account
+        if backend.firmware.device == "nanos":
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        else:
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Scope
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+
+        # custom contracts
+        if (len(tx.signers) > 0 and payloads.WitnessScope.CUSTOM_CONTRACTS in tx.signers[0].scope):
+            for _ in range(len(tx.signers[0].allowed_contracts)):
+                if backend.firmware.device == "nanos":
+                    nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                    nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                    nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                else:
+                    nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+
+        # Approve
+        nav_ins.append(NavIns(NavInsID.BOTH_CLICK))
+
+        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=1.5, middle_instruction_wait=0.5)
+
+    der_sig = backend.last_async_response.data
 
     with serialization.BinaryWriter() as writer:
         tx.serialize_unsigned(writer)
@@ -75,10 +123,12 @@ def test_sign_tx(cmd, button):
                      sigdecode=sigdecode_der) is True
 
 
-def test_sign_vote_script_tx(cmd, button):
+def test_sign_vote_script_tx(backend, firmware, navigator, test_name):
+    client = Neo_n3_Command(backend)
+
     bip44_path: str = "m/44'/888'/0'/0/0"
 
-    pub_key = cmd.get_public_key(
+    pub_key = client.get_public_key(
         bip44_path=bip44_path,
         display=False
     )  # type: bytes
@@ -111,10 +161,48 @@ def test_sign_vote_script_tx(cmd, button):
                               script=sb.to_array(),
                               witnesses=[witness])
 
-    der_sig = cmd.sign_vote_tx(bip44_path=bip44_path,
-                               transaction=tx,
-                               network_magic=magic,
-                               button=button)
+    with client.sign_vote_tx(bip44_path=bip44_path,
+                             transaction=tx,
+                             network_magic=magic):
+        nav_ins = []
+        # Review Transaction
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Vote to public key
+        if backend.firmware.device == "nanos":
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        else:
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Target network
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # System fee
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Network fee
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Total fees
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Valid until
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Signer 1 of 1
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Account 1/3, 2/3, 3/3
+        if backend.firmware.device == "nanos":
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        else:
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Scope
+        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+        # Approve
+        nav_ins.append(NavIns(NavInsID.BOTH_CLICK))
+
+        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=1.5, middle_instruction_wait=0.5)
+
+    der_sig = backend.last_async_response.data
 
     with serialization.BinaryWriter() as writer:
         tx.serialize_unsigned(writer)
