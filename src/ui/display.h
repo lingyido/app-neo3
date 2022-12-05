@@ -43,7 +43,6 @@ enum e_signer_state { START = 0, INDEX = 1, ACCOUNT = 2, SCOPE = 3, CONTRACTS = 
 
 extern struct display_ctx_t display_ctx;
 
-void display_next_state(bool is_upper_delimiter);
 bool get_next_data(enum e_direction direction);
 void next_prop();
 void prev_prop();

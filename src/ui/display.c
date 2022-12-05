@@ -49,6 +49,9 @@ static char g_text[64];               // generic step text
 
 static char g_address[35];  // 34 + \0
 
+
+#ifdef HAVE_BAGL
+
 // Step with icon and text
 UX_STEP_NOCB(ux_display_confirm_addr_step, pn, {&C_icon_eye, "Confirm Address"});
 // Step with title/text for address
@@ -87,6 +90,9 @@ UX_FLOW(ux_display_pubkey_flow,
         &ux_display_address_step,
         &ux_display_approve_step,
         &ux_display_reject_step);
+#else
+    // TODO
+#endif
 
 int ui_display_address() {
     if (G_context.req_type != CONFIRM_ADDRESS || G_context.state != STATE_NONE) {
@@ -103,7 +109,11 @@ int ui_display_address() {
 
     g_validate_callback = &ui_action_validate_pubkey;
 
+#ifdef HAVE_BAGL
     ux_flow_init(0, ux_display_pubkey_flow, NULL);
+#else
+    // TODO
+#endif
 
     return 0;
 }
@@ -118,6 +128,72 @@ struct display_ctx_t {
     int8_t c_index;              // track which signer.contract is to be displayed
     int8_t g_index;              // track which signer.group is to be displayed
 } display_ctx;
+
+
+#ifdef HAVE_BAGL
+
+
+// Taken from Ledger's advanced display management docs
+static void display_next_state(bool is_upper_delimiter) {
+    if (is_upper_delimiter) {  // We're called from the upper delimiter.
+        if (display_ctx.current_state == STATIC_SCREEN) {
+            // Fetch new data.
+            bool dynamic_data = get_next_data(DIRECTION_FORWARD);
+            if (dynamic_data) {
+                // We found some data to display so we now enter in dynamic mode.
+                display_ctx.current_state = DYNAMIC_SCREEN;
+            }
+
+            // Move to the next step, which will display the screen.
+            ux_flow_next();
+        } else {
+            // The previous screen was NOT a static screen, so we were already in a dynamic screen.
+
+            // Fetch new data.
+            bool dynamic_data = get_next_data(DIRECTION_BACKWARD);
+            if (dynamic_data) {
+                // We found some data so simply display it.
+                ux_flow_next();
+            } else {
+                // There's no more dynamic data to display, so
+                // update the current state accordingly.
+                display_ctx.current_state = STATIC_SCREEN;
+
+                // Display the previous screen which should be a static one.
+                ux_flow_prev();
+            }
+        }
+    } else {
+        // We're called from the lower delimiter.
+        if (display_ctx.current_state == STATIC_SCREEN) {
+            // Fetch new data.
+            bool dynamic_data = get_next_data(DIRECTION_BACKWARD);
+            if (dynamic_data) {
+                // We found some data to display so enter in dynamic mode.
+                display_ctx.current_state = DYNAMIC_SCREEN;
+            }
+
+            // Display the data.
+            ux_flow_prev();
+        } else {
+            // We're being called from a dynamic screen, so the user was already browsing the array.
+
+            // Fetch new data.
+            bool dynamic_data = get_next_data(DIRECTION_FORWARD);
+            if (dynamic_data) {
+                // We found some data, so display it.
+                // Similar to `ux_flow_prev()` but updates layout to account for `bnnn_paging`'s
+                // weird behaviour.
+                bnnn_paging_edgecase();
+            } else {
+                // We found no data so make sure we update the state accordingly.
+                display_ctx.current_state = STATIC_SCREEN;
+                // Display the next screen
+                ux_flow_next();
+            }
+        }
+    }
+}
 
 // Step with icon and text
 UX_STEP_NOCB(ux_display_review_step,
@@ -214,6 +290,10 @@ UX_STEP_NOCB(ux_display_generic,
 
 UX_STEP_INIT(ux_lower_delimiter, NULL, NULL, { display_next_state(false); });
 
+#else
+    // TODO
+#endif
+
 void reset_signer_display_state() {
     display_ctx.current_state = STATIC_SCREEN;
     display_ctx.s_index = 0;
@@ -221,6 +301,9 @@ void reset_signer_display_state() {
     display_ctx.c_index = -1;
     display_ctx.p_index = 0;
 }
+
+
+#ifdef HAVE_BAGL
 
 #define MAX_NUM_STEPS 13
 const ux_flow_step_t *ux_display_transaction_flow[MAX_NUM_STEPS + 1];
@@ -267,6 +350,10 @@ void create_transaction_flow() {
     ux_display_transaction_flow[index++] = &ux_display_reject_step;
     ux_display_transaction_flow[index++] = FLOW_END_STEP;
 }
+
+#else
+    // TODO
+#endif
 
 int ui_display_transaction() {
     if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED) {
@@ -347,9 +434,13 @@ int ui_display_transaction() {
     g_validate_callback = &ui_action_validate_transaction;
     reset_signer_display_state();
 
+#ifdef HAVE_BAGL
     // start display
     create_transaction_flow();
     ux_flow_init(0, ux_display_transaction_flow, NULL);
+#else
+    // TODO
+#endif
 
     return 0;
 }
@@ -383,6 +474,7 @@ int parse_scope_name(witness_scope_e scope) {
     return strlen(g_scope);
 }
 
+#ifdef HAVE_BAGL
 // This is a special function you must call for bnnn_paging to work properly in an edgecase.
 // It does some weird stuff with the `G_ux` global which is defined by the SDK.
 // No need to dig deeper into the code, a simple copy paste will do.
@@ -391,6 +483,7 @@ void bnnn_paging_edgecase() {
     G_ux.flow_stack[G_ux.stack_count - 1].index--;
     ux_flow_relayout();
 }
+#endif
 
 static enum e_signer_state signer_property[7] = {START, INDEX, ACCOUNT, SCOPE, CONTRACTS, GROUPS, END};
 
@@ -535,68 +628,6 @@ bool get_next_data(enum e_direction direction) {
         }
         case END: {
             return false;
-        }
-    }
-}
-
-// Taken from Ledger's advanced display management docs
-void display_next_state(bool is_upper_delimiter) {
-    if (is_upper_delimiter) {  // We're called from the upper delimiter.
-        if (display_ctx.current_state == STATIC_SCREEN) {
-            // Fetch new data.
-            bool dynamic_data = get_next_data(DIRECTION_FORWARD);
-            if (dynamic_data) {
-                // We found some data to display so we now enter in dynamic mode.
-                display_ctx.current_state = DYNAMIC_SCREEN;
-            }
-
-            // Move to the next step, which will display the screen.
-            ux_flow_next();
-        } else {
-            // The previous screen was NOT a static screen, so we were already in a dynamic screen.
-
-            // Fetch new data.
-            bool dynamic_data = get_next_data(DIRECTION_BACKWARD);
-            if (dynamic_data) {
-                // We found some data so simply display it.
-                ux_flow_next();
-            } else {
-                // There's no more dynamic data to display, so
-                // update the current state accordingly.
-                display_ctx.current_state = STATIC_SCREEN;
-
-                // Display the previous screen which should be a static one.
-                ux_flow_prev();
-            }
-        }
-    } else {
-        // We're called from the lower delimiter.
-        if (display_ctx.current_state == STATIC_SCREEN) {
-            // Fetch new data.
-            bool dynamic_data = get_next_data(DIRECTION_BACKWARD);
-            if (dynamic_data) {
-                // We found some data to display so enter in dynamic mode.
-                display_ctx.current_state = DYNAMIC_SCREEN;
-            }
-
-            // Display the data.
-            ux_flow_prev();
-        } else {
-            // We're being called from a dynamic screen, so the user was already browsing the array.
-
-            // Fetch new data.
-            bool dynamic_data = get_next_data(DIRECTION_FORWARD);
-            if (dynamic_data) {
-                // We found some data, so display it.
-                // Similar to `ux_flow_prev()` but updates layout to account for `bnnn_paging`'s
-                // weird behaviour.
-                bnnn_paging_edgecase();
-            } else {
-                // We found no data so make sure we update the state accordingly.
-                display_ctx.current_state = STATIC_SCREEN;
-                // Display the next screen
-                ux_flow_next();
-            }
         }
     }
 }
