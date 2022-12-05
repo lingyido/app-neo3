@@ -21,8 +21,7 @@ endif
 
 include $(BOLOS_SDK)/Makefile.defines
 
-
-APP_LOAD_PARAMS = --curve prime256r1
+APP_LOAD_PARAMS = --curve secp256r1
 ifeq ($(TARGET_NAME), TARGET_NANOX)
 APP_LOAD_PARAMS += --appFlags 0x200  # APPLICATION_FLAG_BOLOS_SETTINGS
 else ifeq ($(TARGET_NAME), TARGET_FATSTACKS)
@@ -33,7 +32,7 @@ endif
 APP_LOAD_PARAMS += --path "44'/888'"
 APP_LOAD_PARAMS += $(COMMON_LOAD_PARAMS)
 
-APPNAME      = "NEO N3"
+APPNAME      = "Neo N3"
 APPVERSION_M = 0
 APPVERSION_N = 2
 APPVERSION_P = 0

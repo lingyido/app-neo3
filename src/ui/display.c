@@ -132,6 +132,14 @@ struct display_ctx_t {
 
 #ifdef HAVE_BAGL
 
+// This is a special function you must call for bnnn_paging to work properly in an edgecase.
+// It does some weird stuff with the `G_ux` global which is defined by the SDK.
+// No need to dig deeper into the code, a simple copy paste will do.
+static void bnnn_paging_edgecase(void) {
+    G_ux.flow_stack[G_ux.stack_count - 1].prev_index = G_ux.flow_stack[G_ux.stack_count - 1].index - 2;
+    G_ux.flow_stack[G_ux.stack_count - 1].index--;
+    ux_flow_relayout();
+}
 
 // Taken from Ledger's advanced display management docs
 static void display_next_state(bool is_upper_delimiter) {
@@ -473,17 +481,6 @@ int parse_scope_name(witness_scope_e scope) {
     }
     return strlen(g_scope);
 }
-
-#ifdef HAVE_BAGL
-// This is a special function you must call for bnnn_paging to work properly in an edgecase.
-// It does some weird stuff with the `G_ux` global which is defined by the SDK.
-// No need to dig deeper into the code, a simple copy paste will do.
-void bnnn_paging_edgecase() {
-    G_ux.flow_stack[G_ux.stack_count - 1].prev_index = G_ux.flow_stack[G_ux.stack_count - 1].index - 2;
-    G_ux.flow_stack[G_ux.stack_count - 1].index--;
-    ux_flow_relayout();
-}
-#endif
 
 static enum e_signer_state signer_property[7] = {START, INDEX, ACCOUNT, SCOPE, CONTRACTS, GROUPS, END};
 

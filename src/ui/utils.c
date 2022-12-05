@@ -6,6 +6,10 @@
 
 #include <string.h>
 
+#ifdef HAVE_NBGL
+#include "nbgl_page.h"
+#endif
+
 /** the length of a SHA256 hash */
 #define SHA256_HASH_LEN 32
 
@@ -104,3 +108,12 @@ bool address_from_pubkey(const uint8_t public_key[static 64], char* out, size_t 
     script_hash_to_address(out, out_len, script_hash);
     return true;
 }
+
+#ifdef HAVE_NBGL
+void releaseContext(void) {
+    if (pageContext != NULL) {
+        nbgl_pageRelease(pageContext);
+        pageContext = NULL;
+    }
+}
+#endif
