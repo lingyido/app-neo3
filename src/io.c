@@ -56,10 +56,15 @@ uint8_t io_event(uint8_t channel __attribute__((unused))) {
 #ifdef HAVE_BAGL
             UX_DISPLAYED_EVENT({});
 #endif
+#ifdef HAVE_NBGL
+            UX_DEFAULT_EVENT();
+#endif  // HAVE_NBGL
             break;
+
         case SEPROXYHAL_TAG_TICKER_EVENT:
             UX_TICKER_EVENT(G_io_seproxyhal_spi_buffer, {});
             break;
+
         default:
             UX_DEFAULT_EVENT();
             break;
