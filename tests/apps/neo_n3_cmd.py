@@ -65,12 +65,18 @@ class Neo_n3_Command:
 
     def get_public_key(self, bip44_path: str) -> bytes:
         response = self.backend.exchange_raw(
-            self.builder.get_public_key(bip44_path=bip44_path)
+            self.builder.get_public_key(bip44_path=bip44_path, display=False)
         ).data
 
         assert len(response) == 65 # 04 + 64 bytes of uncompressed key
 
         return response
+
+    @contextmanager
+    def get_public_key_async(self, bip44_path: str) -> Generator[RAPDU, None, None]:
+        payload = self.builder.get_public_key(bip44_path=bip44_path, display=True)
+        with self.backend.exchange_async_raw(payload) as response:
+            yield response
 
     @contextmanager
     def sign_tx(self, bip44_path: str, transaction: payloads.transaction.Transaction, network_magic: int) -> Generator[RAPDU, None, None]:

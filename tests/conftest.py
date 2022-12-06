@@ -2,7 +2,7 @@ import pytest
 from pathlib import Path
 from ragger.firmware import Firmware
 from ragger.backend import SpeculosBackend, LedgerCommBackend, LedgerWalletBackend
-from ragger.navigator import NanoNavigator
+from ragger.navigator import NanoNavigator, FatstacksNavigator
 from ragger.utils import app_path_from_app_name
 
 
@@ -13,9 +13,12 @@ APP_NAME = "neo_n3"
 
 BACKENDS = ["speculos", "ledgercomm", "ledgerwallet"]
 
-FIRMWARES = [Firmware('nanos', '2.1'),
-             Firmware('nanox', '2.0.2'),
-             Firmware('nanosp', '1.0.3')]
+FIRMWARES = [
+    Firmware('nanos', '2.1'),
+    Firmware('nanox', '2.0.2'),
+    Firmware('nanosp', '1.0.3'),
+    Firmware('fat', '1.0'),
+]
 
 
 def pytest_addoption(parser):
@@ -109,7 +112,7 @@ def navigator(backend, firmware, golden_run):
     if firmware.device.startswith("nano"):
         return NanoNavigator(backend, firmware, golden_run)
     else:
-        raise ValueError(f"Device '{firmware.device}' is unsupported.")
+        return FatstacksNavigator(backend, firmware, golden_run)
 
 
 @pytest.fixture(autouse=True)

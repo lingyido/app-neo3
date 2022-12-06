@@ -20,6 +20,7 @@ from ragger.navigator import NavInsID, NavIns
 
 ROOT_SCREENSHOT_PATH = Path(__file__).parent.resolve()
 
+from time import sleep
 def test_sign_tx(backend, firmware, navigator, test_name):
     client = Neo_n3_Command(backend)
 
@@ -63,51 +64,54 @@ def test_sign_tx(backend, firmware, navigator, test_name):
                         transaction=tx,
                         network_magic=magic):
         nav_ins = []
-        # Review Transaction
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Destination address
-        if backend.firmware.device == "nanos":
+        if backend.firmware.device.startswith("nano"):
+            # Review Transaction
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            # Destination address
+            if backend.firmware.device == "nanos":
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            else:
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            # Token Amount
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            # Target network
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        else:
+            # System fee
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Token Amount
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Target network
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # System fee
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Network fee
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Total fees
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Valid until
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Signer 1 of 1
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Account
-        if backend.firmware.device == "nanos":
+            # Network fee
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            # Total fees
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            # Valid until
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        else:
+            # Signer 1 of 1
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Scope
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            # Account
+            if backend.firmware.device == "nanos":
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            else:
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            # Scope
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
 
-        # custom contracts
-        if (len(tx.signers) > 0 and WitnessScope.CUSTOM_CONTRACTS in tx.signers[0].scope):
-            for _ in range(len(tx.signers[0].allowed_contracts)):
-                if backend.firmware.device == "nanos":
-                    nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                    nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                    nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                else:
-                    nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            # custom contracts
+            if (len(tx.signers) > 0 and WitnessScope.CUSTOM_CONTRACTS in tx.signers[0].scope):
+                for _ in range(len(tx.signers[0].allowed_contracts)):
+                    if backend.firmware.device == "nanos":
+                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                    else:
+                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
 
-        # Approve
-        nav_ins.append(NavIns(NavInsID.BOTH_CLICK))
+            # Approve
+            nav_ins.append(NavIns(NavInsID.BOTH_CLICK))
+        else:
+            sleep(10)
 
         navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=1.5, middle_instruction_wait=0.5)
 

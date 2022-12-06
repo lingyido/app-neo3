@@ -143,7 +143,7 @@ class Neo_n3_CommandBuilder:
                               p2=0x00,
                               cdata=b"")
 
-    def get_public_key(self, bip44_path: str) -> bytes:
+    def get_public_key(self, bip44_path: str, display: bool) -> bytes:
         """Command builder for GET_PUBLIC_KEY.
 
         Parameters
@@ -160,7 +160,7 @@ class Neo_n3_CommandBuilder:
         return self.serialize(cla=self.CLA,
                               ins=InsType.INS_GET_PUBLIC_KEY,
                               p1=0x00,
-                              p2=0x00,
+                              p2=int(display == True),
                               cdata=pack_derivation_path(bip44_path)[1:]) # No length prefix
 
     def sign_tx(self, bip44_path: str, transaction: payloads.transaction.Transaction, network_magic: int

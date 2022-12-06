@@ -34,7 +34,8 @@
 #include "utils.h"
 #include "../shared_context.h"
 
-static action_validate_cb g_validate_callback;
+
+static char g_dst_address[35];  // 34 + \0
 static char g_system_fee[30];
 static char g_network_fee[30];
 static char g_total_fees[30];
@@ -47,76 +48,6 @@ static char g_scope[28];              // Longest combination is: "By Entry, Cont
 static char g_title[64];              // generic step title
 static char g_text[64];               // generic step text
 
-static char g_address[35];  // 34 + \0
-
-
-#ifdef HAVE_BAGL
-
-// Step with icon and text
-UX_STEP_NOCB(ux_display_confirm_addr_step, pn, {&C_icon_eye, "Confirm Address"});
-// Step with title/text for address
-UX_STEP_NOCB(ux_display_address_step,
-             bnnn_paging,
-             {
-                 .title = "Address",
-                 .text = g_address,
-             });
-
-// Step with approve button
-UX_STEP_CB(ux_display_approve_step,
-           pb,
-           (*g_validate_callback)(true),
-           {
-               &C_icon_validate_14,
-               "Approve",
-           });
-
-// Step with reject button
-UX_STEP_CB(ux_display_reject_step,
-           pb,
-           (*g_validate_callback)(false),
-           {
-               &C_icon_crossmark,
-               "Reject",
-           });
-
-// FLOW to display address:
-// #1 screen: eye icon + "Confirm Address"
-// #2 screen: display address
-// #3 screen: approve button
-// #4 screen: reject button
-UX_FLOW(ux_display_pubkey_flow,
-        &ux_display_confirm_addr_step,
-        &ux_display_address_step,
-        &ux_display_approve_step,
-        &ux_display_reject_step);
-#else
-    // TODO
-#endif
-
-int ui_display_address() {
-    if (G_context.req_type != CONFIRM_ADDRESS || G_context.state != STATE_NONE) {
-        G_context.state = STATE_NONE;
-        return io_send_sw(SW_BAD_STATE);
-    }
-
-    memset(g_address, 0, sizeof(g_address));
-    char address[ADDRESS_LEN] = {0};  // address in base58 check encoded format
-    if (!address_from_pubkey(G_context.raw_public_key, address, sizeof(address))) {
-        return io_send_sw(SW_CONVERT_TO_ADDRESS_FAIL);
-    }
-    snprintf(g_address, sizeof(g_address), "%s", address);
-
-    g_validate_callback = &ui_action_validate_pubkey;
-
-#ifdef HAVE_BAGL
-    ux_flow_init(0, ux_display_pubkey_flow, NULL);
-#else
-    // TODO
-#endif
-
-    return 0;
-}
 
 /**
  * Hold state around displaying Signers and their properties
@@ -216,7 +147,7 @@ UX_STEP_NOCB(ux_display_dst_address_step,
              bnnn_paging,
              {
                  .title = "Destination addr",
-                 .text = g_address,
+                 .text = g_dst_address,
              });
 
 UX_STEP_NOCB(ux_display_token_amount_step,
@@ -271,7 +202,7 @@ UX_STEP_NOCB(
 
 UX_STEP_CB(ux_display_abort_step,
            pb,
-           (*g_validate_callback)(false),
+           ui_action_validate_transaction(false),
            {
                &C_icon_validate_14,
                "Understood, abort..",
@@ -298,6 +229,23 @@ UX_STEP_NOCB(ux_display_generic,
 
 UX_STEP_INIT(ux_lower_delimiter, NULL, NULL, { display_next_state(false); });
 
+// Step with approve button
+UX_STEP_CB(ux_display_approve_step,
+           pb,
+           ui_action_validate_transaction(true),
+           {
+               &C_icon_validate_14,
+               "Approve",
+           });
+
+// Step with reject button
+UX_STEP_CB(ux_display_reject_step,
+           pb,
+           ui_action_validate_transaction(false),
+           {
+               &C_icon_crossmark,
+               "Reject",
+           });
 #else
     // TODO
 #endif
@@ -370,9 +318,9 @@ int ui_display_transaction() {
     }
 
     if (G_context.tx_info.transaction.is_system_asset_transfer) {
-        memset(g_address, 0, sizeof(g_address));
-        snprintf(g_address, sizeof(g_address), "%s", G_context.tx_info.transaction.dst_address);
-        PRINTF("Destination address: %s\n", g_address);
+        memset(g_dst_address, 0, sizeof(g_dst_address));
+        snprintf(g_dst_address, sizeof(g_dst_address), "%s", G_context.tx_info.transaction.dst_address);
+        PRINTF("Destination address: %s\n", g_dst_address);
 
         memset(g_token_amount, 0, sizeof(g_token_amount));
         char token_amount[30] = {0};
@@ -439,7 +387,6 @@ int ui_display_transaction() {
     snprintf(g_valid_until_block, sizeof(g_valid_until_block), "%d", G_context.tx_info.transaction.valid_until_block);
     PRINTF("Valid until: %s\n", g_valid_until_block);
 
-    g_validate_callback = &ui_action_validate_transaction;
     reset_signer_display_state();
 
 #ifdef HAVE_BAGL
