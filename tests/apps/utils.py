@@ -7,37 +7,6 @@ UINT32_MAX: int = 4294967295
 UINT16_MAX: int = 65535
 
 
-def bip32_path_from_string(path: str) -> List[bytes]:
-    splitted_path: List[str] = path.split("/")
-
-    if not splitted_path:
-        raise Exception(f"BIP32 path format error: '{path}'")
-
-    if "m" in splitted_path and splitted_path[0] == "m":
-        splitted_path = splitted_path[1:]
-
-    return [int(p).to_bytes(4, byteorder="big") if "'" not in p
-            else (0x80000000 | int(p[:-1])).to_bytes(4, byteorder="big")
-            for p in splitted_path]
-
-def bip44_path_from_string(path: str) -> List[bytes]:
-    splitted_path: List[str] = path.split("/")
-
-    if not splitted_path:
-        raise Exception(f"BIP44 path format error: '{path}'")
-
-    if len(splitted_path) != 6:
-        raise ValueError(f"BIP44 invalid chunk count. Expected 6 got {len(splitted_path)}")
-
-    if "m" in splitted_path and splitted_path[0] == "m":
-        splitted_path = splitted_path[1:]
-
-    return [int(p).to_bytes(4, byteorder="big") if "'" not in p
-            else (0x80000000 | int(p[:-1])).to_bytes(4, byteorder="big")
-            for p in splitted_path]
-
-
-
 def write_varint(n: int) -> bytes:
     if n < 0xFC:
         return n.to_bytes(1, byteorder="little")
