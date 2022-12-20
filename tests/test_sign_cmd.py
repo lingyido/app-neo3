@@ -22,10 +22,7 @@ def test_sign_tx(backend, firmware, navigator, test_name):
 
     bip44_path: str = "m/44'/888'/0'/0/0"
 
-    pub_key = client.get_public_key(
-        bip44_path=bip44_path,
-        display=False
-    )  # type: bytes
+    pub_key = client.get_public_key(bip44_path=bip44_path)
 
     pk: VerifyingKey = VerifyingKey.from_string(
         pub_key,
@@ -128,10 +125,7 @@ def test_sign_vote_script_tx(backend, firmware, navigator, test_name):
 
     bip44_path: str = "m/44'/888'/0'/0/0"
 
-    pub_key = client.get_public_key(
-        bip44_path=bip44_path,
-        display=False
-    )  # type: bytes
+    pub_key = client.get_public_key(bip44_path=bip44_path)
 
     pk: VerifyingKey = VerifyingKey.from_string(
         pub_key,

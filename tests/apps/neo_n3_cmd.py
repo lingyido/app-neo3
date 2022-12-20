@@ -63,7 +63,7 @@ class Neo_n3_Command:
         rapdu = self.backend.exchange_raw(cmd)
         return rapdu.data.decode("ascii")
 
-    def get_public_key(self, bip44_path: str, display: bool = False) -> bytes:
+    def get_public_key(self, bip44_path: str) -> bytes:
         response = self.backend.exchange_raw(
             self.builder.get_public_key(bip44_path=bip44_path)
         ).data
