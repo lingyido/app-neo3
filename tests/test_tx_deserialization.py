@@ -12,7 +12,8 @@ from ragger.backend.interface import BackendInterface, RAPDU
 from ragger.backend import RaisePolicy
 from ragger.bip import pack_derivation_path
 
-from neo3.network.payloads import WitnessScope, Transaction, Signer, HighPriorityAttribute, OracleResponse
+from neo3.network.payloads.transaction import Transaction, HighPriorityAttribute, OracleResponse
+from neo3.network.payloads.verification import WitnessScope, Signer
 from neo3.core import types, serialization
 
 from pathlib import Path

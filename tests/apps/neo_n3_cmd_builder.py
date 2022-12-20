@@ -163,7 +163,7 @@ class Neo_n3_CommandBuilder:
                               p2=0x00,
                               cdata=pack_derivation_path(bip44_path)[1:]) # No length prefix
 
-    def sign_tx(self, bip44_path: str, transaction: payloads.Transaction, network_magic: int
+    def sign_tx(self, bip44_path: str, transaction: payloads.transaction.Transaction, network_magic: int
                 ) -> Iterator[Tuple[bool, bytes]]:
         """Command builder for INS_SIGN_TX.
 
@@ -171,7 +171,7 @@ class Neo_n3_CommandBuilder:
         ----------
         bip44_path : str
             String representation of BIP44 path.
-        transaction : payloads.Transaction
+        transaction : payloads.transaction.Transaction
         network_magic: network magic for MainNet, TestNet or a private network.
 
         Yields
