@@ -3,7 +3,7 @@ import logging
 import struct
 from typing import List, Tuple, Union, Iterator, cast
 
-from .utils import bip44_path_from_string
+from ragger.bip import pack_derivation_path
 from neo3.network import node, payloads
 from neo3.core import serialization
 
@@ -157,16 +157,13 @@ class Neo_n3_CommandBuilder:
             APDU command for GET_PUBLIC_KEY.
 
         """
-        bip44_paths: List[bytes] = bip44_path_from_string(bip44_path)
-        cdata: bytes = b"".join([*bip44_paths])
-
         return self.serialize(cla=self.CLA,
                               ins=InsType.INS_GET_PUBLIC_KEY,
                               p1=0x00,
                               p2=0x00,
-                              cdata=cdata)
+                              cdata=pack_derivation_path(bip44_path)[1:]) # No length prefix
 
-    def sign_tx(self, bip44_path: str, transaction: payloads.Transaction, network_magic: int
+    def sign_tx(self, bip44_path: str, transaction: payloads.transaction.Transaction, network_magic: int
                 ) -> Iterator[Tuple[bool, bytes]]:
         """Command builder for INS_SIGN_TX.
 
@@ -174,7 +171,7 @@ class Neo_n3_CommandBuilder:
         ----------
         bip44_path : str
             String representation of BIP44 path.
-        transaction : payloads.Transaction
+        transaction : payloads.transaction.Transaction
         network_magic: network magic for MainNet, TestNet or a private network.
 
         Yields
@@ -183,14 +180,11 @@ class Neo_n3_CommandBuilder:
             APDU command chunk for INS_SIGN_TX.
 
         """
-        bip44_paths: List[bytes] = bip44_path_from_string(bip44_path)
-        cdata: bytes = b"".join([*bip44_paths])
-
         yield False, self.serialize(cla=self.CLA,
                                     ins=InsType.INS_SIGN_TX,
                                     p1=0x00,
                                     p2=0x80,
-                                    cdata=cdata)
+                                    cdata=pack_derivation_path(bip44_path)[1:]) # No length prefix
 
         magic = struct.pack("I", network_magic)
         yield False, self.serialize(cla=self.CLA,

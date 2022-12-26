@@ -63,7 +63,7 @@ class Neo_n3_Command:
         rapdu = self.backend.exchange_raw(cmd)
         return rapdu.data.decode("ascii")
 
-    def get_public_key(self, bip44_path: str, display: bool = False) -> bytes:
+    def get_public_key(self, bip44_path: str) -> bytes:
         response = self.backend.exchange_raw(
             self.builder.get_public_key(bip44_path=bip44_path)
         ).data
@@ -73,7 +73,7 @@ class Neo_n3_Command:
         return response
 
     @contextmanager
-    def sign_tx(self, bip44_path: str, transaction: payloads.Transaction, network_magic: int) -> Generator[RAPDU, None, None]:
+    def sign_tx(self, bip44_path: str, transaction: payloads.transaction.Transaction, network_magic: int) -> Generator[RAPDU, None, None]:
         for is_last, chunk in self.builder.sign_tx(bip44_path=bip44_path,
                                                    transaction=transaction,
                                                    network_magic=network_magic):

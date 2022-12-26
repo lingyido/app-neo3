@@ -18,7 +18,7 @@ The application to test must be compiled for all required devices.
 You can use for this the container `ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite`:
 ```
 docker pull ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite:latest
-cd app-<appname>/                               # replace <appname> with the name of your app, (eg neo_n3)
+cd <your app repository>                        # replace <appname> with the name of your app, (eg boilerplate)
 docker run --user "$(id -u)":"$(id -g)" --rm -ti -v "$(realpath .):/app" --privileged -v "/dev/bus/usb:/dev/bus/usb" ledger-app-builder-lite:latest
 make clean && make BOLOS_SDK=$<device>_SDK      # replace <device> with one of [NANOS, NANOX, NANOSP]
 exit
@@ -30,8 +30,8 @@ Copy the compiled binaries to the `elfs` directory, create the directory if nece
 ```
 mkdir -p tests/elfs/
 cp bin/app.elf tests/elfs/<appname>_<device>.elf    # replace <device> with one of [nanos, nanox, nanosp]
-                                                    # replace <appname> with the name of your app, (eg neo_n3)
-                                                    # so for example tests/elfs/neo_n3_nanos.elf
+                                                    # replace <appname> with the name of your app, (eg boilerplate)
+                                                    # so for example tests/elfs/boilerplate_nanos.elf
 ```
 
 You can use the following command to get your first experience with Ragger and Speculos
@@ -43,11 +43,11 @@ Or you can refer to the section `Available pytest options` to configure the opti
 
 ### Run a simple test using a real device
 
-The application to test must be loaded on a Ledger device plugged in USB.
+The application to test must be loaded and started on a Ledger device plugged in USB.
 You can use for this the container `ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite`:
 ```
 docker pull ghcr.io/ledgerhq/ledger-app-builder/ledger-app-builder-lite:latest
-cd app-<appname>/                                   # replace <appname> with the name of your app, (eg neo_n3)
+cd app-<appname>/                                   # replace <appname> with the name of your app, (eg boilerplate)
 docker run --user "$(id -u)":"$(id -g)" --rm -ti -v "$(realpath .):/app" --privileged -v "/dev/bus/usb:/dev/bus/usb" ledger-app-builder-lite:latest
 make clean && make BOLOS_SDK=$<device>_SDK load     # replace <device> with one of [NANOS, NANOX, NANOSP]
 exit
@@ -63,12 +63,12 @@ Or you can refer to the section `Available pytest options` to configure the opti
 
 ## Available pytest options
 
-Standard recommended pytest options
+Standard useful pytest options
 ```
     -v              formats the test summary in a readable way
     -s              enable logs for successful tests, on Speculos it will enable app logs if compiled with DEBUG=1
     -k <testname>   only run the tests that contain <testname> in their names
-    --tb=short      in case of errors, formats the testtraceback in a readable way
+    --tb=short      in case of errors, formats the test traceback in a readable way
 ``` 
 
 Custom pytest options

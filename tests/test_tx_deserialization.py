@@ -7,12 +7,13 @@ import logging
 from apps.neo_n3_cmd import Neo_n3_Command
 from apps.neo_n3_cmd_builder import InsType, Neo_n3_CommandBuilder
 from apps.exception import errors, DeviceException
-from apps.utils import bip44_path_from_string
 
 from ragger.backend.interface import BackendInterface, RAPDU
 from ragger.backend import RaisePolicy
+from ragger.bip import pack_derivation_path
 
-from neo3.network.payloads import WitnessScope, Transaction, Signer, HighPriorityAttribute, OracleResponse
+from neo3.network.payloads.transaction import Transaction, HighPriorityAttribute, OracleResponse
+from neo3.network.payloads.verification import WitnessScope, Signer
 from neo3.core import types, serialization
 
 from pathlib import Path
@@ -101,14 +102,11 @@ def serialize(cla: int, ins: Union[int, enum.IntEnum], p1: int = 0, p2: int = 0,
 
 
 def send_bip44_and_magic(backend: BackendInterface):
-    bip44_paths: List[bytes] = bip44_path_from_string(bip44_path)
-    cdata: bytes = b"".join([*bip44_paths])
-
     backend.exchange_raw(serialize(cla=CLA,
                                    ins=InsType.INS_SIGN_TX,
                                    p1=0x00,
                                    p2=0x80,
-                                   cdata=cdata))
+                                   cdata=pack_derivation_path(bip44_path)[1:])) # No length prefix
 
     magic = struct.pack("I", network_magic)
     backend.exchange_raw(serialize(cla=CLA,
