@@ -27,12 +27,6 @@ enum e_state {
 
 enum e_direction { DIRECTION_FORWARD, DIRECTION_BACKWARD };
 
-/**
- * State indicating which Signer property to show
- *
- */
-enum e_signer_state { START = 0, INDEX = 1, ACCOUNT = 2, SCOPE = 3, CONTRACTS = 4, GROUPS = 5, END = 6 };
-
 extern struct display_ctx_t display_ctx;
 
 bool get_next_data(enum e_direction direction);

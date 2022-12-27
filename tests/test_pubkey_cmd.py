@@ -15,6 +15,7 @@ def test_get_public_key_no_confirm(backend, firmware):
         pub_key = client.get_public_key(bip44_path=path)
         ref_public_key, _ = calculate_public_key_and_chaincode(curve=CurveChoice.Nist256p1, path=path)
         assert pub_key.hex() == ref_public_key
+        print(pub_key.hex())
 
 def test_get_public_key_confirm_ok(backend, firmware, navigator, test_name):
     client = Neo_n3_Command(backend)

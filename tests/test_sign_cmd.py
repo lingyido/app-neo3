@@ -35,10 +35,15 @@ def test_sign_tx(backend, firmware, navigator, test_name):
     )
 
     signer = Signer(account=types.UInt160.from_string("d7678dd97c000be3f33e9362e673101bac4ca654"),
-                             scope=WitnessScope.CUSTOM_CONTRACTS)
+                    scope=WitnessScope.CUSTOM_CONTRACTS)
 
+    signer2 = Signer(account=types.UInt160.from_string("d7678dd97c000be3f33e9362e673101bac412345"),
+                     scope=WitnessScope.CUSTOM_CONTRACTS | WitnessScope.CUSTOM_GROUPS)
     for i in range(1, 17):
         signer.allowed_contracts.append(types.UInt160(20 * i.to_bytes(1, 'little')))
+
+    signer2.allowed_contracts.append(types.UInt160.from_string("5b7074e873973a6ed3708862f219a6fbf4d1c411"))
+    signer2.allowed_contracts.append(types.UInt160.from_string("862f219a6fbf4d1c4115b7074e873973a6ed3708"))
 
     witness = Witness(invocation_script=b'', verification_script=b'\x55')
     magic = 860833102
@@ -56,7 +61,7 @@ def test_sign_tx(backend, firmware, navigator, test_name):
                      network_fee=789,
                      valid_until_block=1,
                      attributes=[],
-                     signers=[signer],
+                     signers=[signer, signer2],
                      script=sb.to_array(),
                      witnesses=[witness])
 
@@ -111,9 +116,10 @@ def test_sign_tx(backend, firmware, navigator, test_name):
             # Approve
             nav_ins.append(NavIns(NavInsID.BOTH_CLICK))
         else:
-            sleep(10)
+            pass
 
-        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=1.5, middle_instruction_wait=0.5)
+            # sleep(15)
+        # navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=1.5, middle_instruction_wait=0.5)
 
     der_sig = backend.last_async_response.data
 
