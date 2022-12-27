@@ -20,7 +20,6 @@ from ragger.navigator import NavInsID, NavIns
 
 ROOT_SCREENSHOT_PATH = Path(__file__).parent.resolve()
 
-from time import sleep
 def test_sign_tx(backend, firmware, navigator, test_name):
     client = Neo_n3_Command(backend)
 
@@ -91,7 +90,7 @@ def test_sign_tx(backend, firmware, navigator, test_name):
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
             # Valid until
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Signer 1 of 1
+            # Signer 1 of 2
             nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
             # Account
             if backend.firmware.device == "nanos":
@@ -106,6 +105,28 @@ def test_sign_tx(backend, firmware, navigator, test_name):
             # custom contracts
             if (len(tx.signers) > 0 and WitnessScope.CUSTOM_CONTRACTS in tx.signers[0].scope):
                 for _ in range(len(tx.signers[0].allowed_contracts)):
+                    if backend.firmware.device == "nanos":
+                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                    else:
+                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+
+            # Signer 2 of 2
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            # Account
+            if backend.firmware.device == "nanos":
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            else:
+                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            # Scope
+            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+
+            # custom contracts
+            if (len(tx.signers) > 0 and WitnessScope.CUSTOM_CONTRACTS in tx.signers[1].scope):
+                for _ in range(len(tx.signers[1].allowed_contracts)):
                     if backend.firmware.device == "nanos":
                         nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
                         nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
@@ -130,7 +151,7 @@ def test_sign_tx(backend, firmware, navigator, test_name):
             nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen approve?
             nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_CONFIRM))
 
-        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=4.0, middle_instruction_wait=4.0, last_instruction_wait=4.0)
+        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=1.0, middle_instruction_wait=0.5, last_instruction_wait=1.0)
 
     der_sig = backend.last_async_response.data
 
