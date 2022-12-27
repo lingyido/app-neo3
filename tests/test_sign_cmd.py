@@ -115,11 +115,22 @@ def test_sign_tx(backend, firmware, navigator, test_name):
 
             # Approve
             nav_ins.append(NavIns(NavInsID.BOTH_CLICK))
-        else:
-            pass
+        elif backend.firmware.device == "fat":
+            # Navigate a bit through rejection screens before confirming
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
+            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen 0
+            for _ in range(4):
+                nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))  # screen 4
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_PREVIOUS)) # screen 3
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
+            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen 3
+            for _ in range(15):
+                nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))  # screen approve?
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
+            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen approve?
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_CONFIRM))
 
-            # sleep(15)
-        # navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=1.5, middle_instruction_wait=0.5)
+        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=4.0, middle_instruction_wait=4.0, last_instruction_wait=4.0)
 
     der_sig = backend.last_async_response.data
 
