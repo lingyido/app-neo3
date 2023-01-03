@@ -5,7 +5,6 @@ from apps.neo_n3_cmd import Neo_n3_Command
 from ragger.navigator import NavInsID, NavIns
 from ragger.bip import calculate_public_key_and_chaincode, CurveChoice
 from ragger.backend import RaisePolicy
-from utils import create_simple_nav_instructions
 
 ROOT_SCREENSHOT_PATH = Path(__file__).parent.resolve()
 
@@ -21,17 +20,21 @@ def test_get_public_key_confirm_ok(backend, firmware, navigator, test_name):
     client = Neo_n3_Command(backend)
     path = "m/44'/888'/0'/0/0"
     with client.get_public_key_async(bip44_path=path):
-        if backend.firmware.device == "nanos":
-            nav_ins = create_simple_nav_instructions(3)
-        elif backend.firmware.device.startswith("nano"):
-            nav_ins = create_simple_nav_instructions(2)
-        else:
-            nav_ins = [
-                       # NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_SHOW_QR),
-                       NavIns(NavInsID.TOUCH, (197,276)),
-                       NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_EXIT_QR),
-                       NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_CONFIRM)]
-        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+        if backend.firmware.device.startswith("nano"):
+            navigator.navigate_until_text_and_compare(navigate_instruction=NavIns(NavInsID.RIGHT_CLICK),
+                                                      validation_instructions=[NavIns(NavInsID.BOTH_CLICK)],
+                                                      text="Approve",
+                                                      path=ROOT_SCREENSHOT_PATH,
+                                                      test_case_name=test_name)
+        elif backend.firmware.device == "fat":
+            nav_ins = []
+            # nav_ins.append(NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_SHOW_QR))
+            nav_ins.append(NavIns(NavInsID.TOUCH, (197,276)))
+            nav_ins.append(NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_EXIT_QR))
+            nav_ins.append(NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_CONFIRM))
+            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+
+
     pub_key = backend.last_async_response.data
 
     ref_public_key, _ = calculate_public_key_and_chaincode(curve=CurveChoice.Nist256p1, path=path)
@@ -40,14 +43,17 @@ def test_get_public_key_confirm_ok(backend, firmware, navigator, test_name):
 def test_get_public_key_confirm_refused(backend, firmware, navigator, test_name):
     client = Neo_n3_Command(backend)
     path = "m/44'/888'/0'/0/0"
+    backend.raise_policy = RaisePolicy.RAISE_NOTHING
     with client.get_public_key_async(bip44_path=path):
-        if backend.firmware.device == "nanos":
-            nav_ins = create_simple_nav_instructions(3 + 1)
-        elif backend.firmware.device.startswith("nano"):
-            nav_ins = create_simple_nav_instructions(2 + 1)
-        else:
+        if backend.firmware.device.startswith("nano"):
+            navigator.navigate_until_text_and_compare(navigate_instruction=NavIns(NavInsID.RIGHT_CLICK),
+                                                      validation_instructions=[NavIns(NavInsID.BOTH_CLICK)],
+                                                      text="Reject",
+                                                      path=ROOT_SCREENSHOT_PATH,
+                                                      test_case_name=test_name)
+        elif backend.firmware.device == "fat":
             nav_ins = [NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_CANCEL)]
-        backend.raise_policy = RaisePolicy.RAISE_NOTHING
-        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+
     rapdu = backend.last_async_response
     assert rapdu.status == 0x6985 # Deny error

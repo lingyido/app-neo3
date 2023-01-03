@@ -15,7 +15,6 @@ from neo3 import contracts, vm
 from neo3.wallet.utils import address_to_script_hash
 from neo3.api.wrappers import NeoToken
 
-from utils import create_simple_nav_instructions
 from ragger.navigator import NavInsID, NavIns
 from ragger.backend import RaisePolicy
 
