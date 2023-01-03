@@ -29,6 +29,14 @@ void format_account(const signer_t *s, char *dest_title, size_t dest_title_size,
     format_hex(s->account, 20, dest_text, dest_text_size);
 }
 
+static void strlcat_with_comma(char *dest, const char *text, size_t dest_size, bool *is_first) {
+    if (!*is_first) {
+        strlcat(dest, ",", dest_size);
+    }
+    strlcat(dest, text, dest_size);
+    *is_first = false;
+}
+
 void format_scope(const signer_t *s, char *dest_title, size_t dest_title_size, char *dest_text, size_t dest_text_size) {
     strlcpy(dest_title, "Scope", dest_title_size);
     if (s->scope == NONE) {
@@ -37,30 +45,15 @@ void format_scope(const signer_t *s, char *dest_title, size_t dest_title_size, c
         strlcpy(dest_text, "Global", dest_text_size);
     } else {
         bool is_first = true;
-        memset(dest_text, 0, dest_text_size);
         strlcpy(dest_text, "By ", dest_text_size);
         if (s->scope & CALLED_BY_ENTRY) {
-            if (!is_first) {
-                strlcat(dest_text, ",", dest_text_size);
-            }
-            strlcat(dest_text, "Entry", dest_text_size);
-            is_first = false;
+            strlcat_with_comma(dest_text, "Entry", dest_text_size, &is_first);
         }
-
         if (s->scope & CUSTOM_CONTRACTS) {
-            if (!is_first) {
-                strlcat(dest_text, ",", dest_text_size);
-            }
-            strlcat(dest_text, "Contracts", dest_text_size);
-            is_first = false;
+            strlcat_with_comma(dest_text, "Contracts", dest_text_size, &is_first);
         }
-
         if (s->scope & CUSTOM_GROUPS) {
-            if (!is_first) {
-                strlcat(dest_text, ",", dest_text_size);
-            }
-            strlcat(dest_text, "Groups", dest_text_size);
-            is_first = false;
+            strlcat_with_comma(dest_text, "Groups", dest_text_size, &is_first);
         }
     }
 }
