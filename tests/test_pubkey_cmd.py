@@ -31,7 +31,7 @@ def test_get_public_key_confirm_ok(backend, firmware, navigator, test_name):
                        NavIns(NavInsID.TOUCH, (197,276)),
                        NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_EXIT_QR),
                        NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_CONFIRM)]
-        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=4.0, middle_instruction_wait=4.0, last_instruction_wait=4.0)
+        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
     pub_key = backend.last_async_response.data
 
     ref_public_key, _ = calculate_public_key_and_chaincode(curve=CurveChoice.Nist256p1, path=path)
@@ -48,6 +48,6 @@ def test_get_public_key_confirm_refused(backend, firmware, navigator, test_name)
         else:
             nav_ins = [NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_CANCEL)]
         backend.raise_policy = RaisePolicy.RAISE_NOTHING
-        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=4.0, middle_instruction_wait=4.0, last_instruction_wait=4.0)
+        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
     rapdu = backend.last_async_response
     assert rapdu.status == 0x6985 # Deny error

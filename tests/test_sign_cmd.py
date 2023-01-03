@@ -67,77 +67,17 @@ def test_sign_tx(backend, firmware, navigator, test_name):
     with client.sign_tx(bip44_path=bip44_path,
                         transaction=tx,
                         network_magic=magic):
-        nav_ins = []
+
         if backend.firmware.device.startswith("nano"):
-            # Review Transaction
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Destination address
-            if backend.firmware.device == "nanos":
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            else:
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Token Amount
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Target network
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # System fee
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Network fee
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Total fees
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Valid until
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Signer 1 of 2
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Account
-            if backend.firmware.device == "nanos":
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            else:
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Scope
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
+            navigator.navigate_until_text_and_compare(navigate_instruction=NavIns(NavInsID.RIGHT_CLICK),
+                                                      validation_instructions=[NavIns(NavInsID.BOTH_CLICK)],
+                                                      text="Approve",
+                                                      path=ROOT_SCREENSHOT_PATH,
+                                                      test_case_name=test_name)
 
-            # custom contracts
-            if (len(tx.signers) > 0 and WitnessScope.CUSTOM_CONTRACTS in tx.signers[0].scope):
-                for _ in range(len(tx.signers[0].allowed_contracts)):
-                    if backend.firmware.device == "nanos":
-                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                    else:
-                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-
-            # Signer 2 of 2
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Account
-            if backend.firmware.device == "nanos":
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            else:
-                nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            # Scope
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-
-            # custom contracts
-            if (len(tx.signers) > 0 and WitnessScope.CUSTOM_CONTRACTS in tx.signers[1].scope):
-                for _ in range(len(tx.signers[1].allowed_contracts)):
-                    if backend.firmware.device == "nanos":
-                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-                    else:
-                        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-
-            # Approve
-            nav_ins.append(NavIns(NavInsID.BOTH_CLICK))
         elif backend.firmware.device == "fat":
             # Navigate a bit through rejection screens before confirming
+            nav_ins = []
             nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
             nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen 0
             for _ in range(4):
@@ -145,13 +85,13 @@ def test_sign_tx(backend, firmware, navigator, test_name):
             nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_PREVIOUS)) # screen 3
             nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
             nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen 3
-            for _ in range(15):
+            for _ in range(11):
                 nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))  # screen approve?
             nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
             nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen approve?
             nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_CONFIRM))
 
-        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=1.0, middle_instruction_wait=0.5, last_instruction_wait=1.0)
+            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
 
     der_sig = backend.last_async_response.data
 
@@ -179,7 +119,7 @@ def test_sign_vote_script_tx(backend, firmware, navigator, test_name):
     )
 
     signer = Signer(account=types.UInt160.from_string("d7678dd97c000be3f33e9362e673101bac4ca654"),
-                             scope=WitnessScope.CALLED_BY_ENTRY)
+                    scope=WitnessScope.CALLED_BY_ENTRY)
     witness = Witness(invocation_script=b'', verification_script=b'\x55')
     magic = 860833102
 
@@ -203,43 +143,30 @@ def test_sign_vote_script_tx(backend, firmware, navigator, test_name):
     with client.sign_vote_tx(bip44_path=bip44_path,
                              transaction=tx,
                              network_magic=magic):
-        nav_ins = []
-        # Review Transaction
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Vote to public key
-        if backend.firmware.device == "nanos":
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        else:
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Target network
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # System fee
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Network fee
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Total fees
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Valid until
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Signer 1 of 1
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Account 1/3, 2/3, 3/3
-        if backend.firmware.device == "nanos":
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        else:
-            nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Scope
-        nav_ins.append(NavIns(NavInsID.RIGHT_CLICK))
-        # Approve
-        nav_ins.append(NavIns(NavInsID.BOTH_CLICK))
 
-        navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins, first_instruction_wait=1.5, middle_instruction_wait=0.5)
+        if backend.firmware.device.startswith("nano"):
+            navigator.navigate_until_text_and_compare(navigate_instruction=NavIns(NavInsID.RIGHT_CLICK),
+                                                      validation_instructions=[NavIns(NavInsID.BOTH_CLICK)],
+                                                      text="Approve",
+                                                      path=ROOT_SCREENSHOT_PATH,
+                                                      test_case_name=test_name)
+
+        elif backend.firmware.device == "fat":
+            # Navigate a bit through rejection screens before confirming
+            nav_ins = []
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
+            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen 0
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen 1
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen 2
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen 3
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen approve?
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_PREVIOUS)) # screen 3
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen approve?
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
+            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen approve?
+            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_CONFIRM))
+
+            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
 
     der_sig = backend.last_async_response.data
 
