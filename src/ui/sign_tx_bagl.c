@@ -17,7 +17,6 @@
 #include "../shared_context.h"
 #include "sign_tx_common.h"
 
-
 #ifdef HAVE_BAGL
 
 /**

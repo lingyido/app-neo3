@@ -19,12 +19,20 @@
 
 global_item_storage_t G_tx;
 
-void format_signer(uint8_t signer_idx, char *dest_title, size_t dest_title_size, char *dest_text, size_t dest_text_size) {
+void format_signer(uint8_t signer_idx,
+                   char *dest_title,
+                   size_t dest_title_size,
+                   char *dest_text,
+                   size_t dest_text_size) {
     strlcpy(dest_title, "Signer", dest_title_size);
     snprintf(dest_text, dest_text_size, "%d of %d", signer_idx + 1, G_context.tx_info.transaction.signers_size);
 }
 
-void format_account(const signer_t *s, char *dest_title, size_t dest_title_size, char *dest_text, size_t dest_text_size) {
+void format_account(const signer_t *s,
+                    char *dest_title,
+                    size_t dest_title_size,
+                    char *dest_text,
+                    size_t dest_text_size) {
     strlcpy(dest_title, "Account", dest_title_size);
     format_hex(s->account, 20, dest_text, dest_text_size);
 }
@@ -58,12 +66,22 @@ void format_scope(const signer_t *s, char *dest_title, size_t dest_title_size, c
     }
 }
 
-void format_contract(const signer_t *s, uint8_t contract_index, char *dest_title, size_t dest_title_size, char *dest_text, size_t dest_text_size) {
+void format_contract(const signer_t *s,
+                     uint8_t contract_index,
+                     char *dest_title,
+                     size_t dest_title_size,
+                     char *dest_text,
+                     size_t dest_text_size) {
     snprintf(dest_title, dest_title_size, "Contract %d of %d", contract_index + 1, s->allowed_contracts_size);
     format_hex(s->allowed_contracts[contract_index], UINT160_LEN, dest_text, dest_text_size);
 }
 
-void format_group(const signer_t *s, uint8_t group_index, char *dest_title, size_t dest_title_size, char *dest_text, size_t dest_text_size) {
+void format_group(const signer_t *s,
+                  uint8_t group_index,
+                  char *dest_title,
+                  size_t dest_title_size,
+                  char *dest_text,
+                  size_t dest_text_size) {
     snprintf(dest_title, dest_title_size, "Group %d of %d", group_index + 1, s->allowed_groups_size);
     format_hex(s->allowed_groups[group_index], ECPOINT_LEN, dest_text, dest_text_size);
 }
@@ -136,7 +154,10 @@ int start_sign_tx(void) {
     }
     snprintf(G_tx.total_fees, sizeof(G_tx.total_fees), "GAS %.*s", sizeof(total_fee), total_fee);
 
-    snprintf(G_tx.valid_until_block, sizeof(G_tx.valid_until_block), "%d", G_context.tx_info.transaction.valid_until_block);
+    snprintf(G_tx.valid_until_block,
+             sizeof(G_tx.valid_until_block),
+             "%d",
+             G_context.tx_info.transaction.valid_until_block);
     PRINTF("Valid until: %s\n", G_tx.valid_until_block);
 
     start_sign_tx_ui();

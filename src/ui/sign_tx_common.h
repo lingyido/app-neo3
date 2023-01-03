@@ -21,17 +21,34 @@ typedef struct global_item_storage_s {
 
 extern global_item_storage_t G_tx;
 
-void format_signer(uint8_t signer_idx, char *dest_title, size_t dest_title_size, char *dest_text, size_t dest_text_size);
+void format_signer(uint8_t signer_idx,
+                   char *dest_title,
+                   size_t dest_title_size,
+                   char *dest_text,
+                   size_t dest_text_size);
 
-void format_account(const signer_t *s, char *dest_title, size_t dest_title_size, char *dest_text, size_t dest_text_size);
+void format_account(const signer_t *s,
+                    char *dest_title,
+                    size_t dest_title_size,
+                    char *dest_text,
+                    size_t dest_text_size);
 
 void format_scope(const signer_t *s, char *dest_title, size_t dest_title_size, char *dest_text, size_t dest_text_size);
 
-void format_contract(const signer_t *s, uint8_t contract_index, char *dest_title, size_t dest_title_size, char *dest_text, size_t dest_text_size);
+void format_contract(const signer_t *s,
+                     uint8_t contract_index,
+                     char *dest_title,
+                     size_t dest_title_size,
+                     char *dest_text,
+                     size_t dest_text_size);
 
-void format_group(const signer_t *s, uint8_t group_index, char *dest_title, size_t dest_title_size, char *dest_text, size_t dest_text_size);
+void format_group(const signer_t *s,
+                  uint8_t group_index,
+                  char *dest_title,
+                  size_t dest_title_size,
+                  char *dest_text,
+                  size_t dest_text_size);
 
 int start_sign_tx(void);
 
 void start_sign_tx_ui(void);
-

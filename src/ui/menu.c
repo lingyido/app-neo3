@@ -33,7 +33,6 @@
 #include "nbgl_use_case.h"
 #endif
 
-
 #ifdef HAVE_BAGL
 
 static void ui_menu_about();
@@ -136,9 +135,7 @@ enum {
     SWITCH_CONTRACT_DATA_SET_TOKEN = FIRST_USER_TOKEN,
 };
 
-
-
-static bool settings_nav_callback(uint8_t page, nbgl_pageContent_t *content) {
+static bool settings_nav_callback(uint8_t page, nbgl_pageContent_t* content) {
     if (page == 0) {
         content->type = SWITCHES_LIST;
         content->switchesList.nbSwitches = NB_SETTINGS_SWITCHES;
@@ -161,11 +158,11 @@ void ui_menu_settings(void);
 static void settingsControlsCallback(int token, uint8_t index) {
     bool new_setting;
     UNUSED(index);
-    switch(token) {
+    switch (token) {
         case SWITCH_CONTRACT_DATA_SET_TOKEN:
             G_switches[0].initState = !(G_switches[0].initState);
             new_setting = (G_switches[0].initState == ON_STATE);
-            nvm_write((void *) &N_storage.scriptsAllowed, &new_setting, 1);
+            nvm_write((void*) &N_storage.scriptsAllowed, &new_setting, 1);
             ui_menu_settings();
             break;
         default:
@@ -184,14 +181,24 @@ void ui_menu_settings(void) {
     } else {
         G_switches[0].initState = OFF_STATE;
     }
-    nbgl_useCaseSettings(APPNAME " settings",0,2,false,ui_menu_main_nbgl, settings_nav_callback, settingsControlsCallback);
+    nbgl_useCaseSettings(APPNAME " settings",
+                         0,
+                         2,
+                         false,
+                         ui_menu_main_nbgl,
+                         settings_nav_callback,
+                         settingsControlsCallback);
 }
 
 static void ui_menu_main_nbgl(void) {
-    nbgl_useCaseHome(APPNAME, &C_icon_neo_n3_64x64, "This app confirms actions on\nthe " APPNAME " network.", true, ui_menu_settings, quit_app_callback);
+    nbgl_useCaseHome(APPNAME,
+                     &C_icon_neo_n3_64x64,
+                     "This app confirms actions on\nthe " APPNAME " network.",
+                     true,
+                     ui_menu_settings,
+                     quit_app_callback);
 }
 #endif
-
 
 void ui_menu_main() {
 #ifdef HAVE_BAGL

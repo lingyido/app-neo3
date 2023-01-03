@@ -33,8 +33,6 @@
 #include "../transaction/types.h"
 #include "../transaction/deserialize.h"
 
-
-
 int handler_sign_tx(buffer_t *cdata, uint8_t chunk, bool more) {
     if (chunk == 0) {  // First APDU, parse BIP44 path
         explicit_bzero(&G_context, sizeof(G_context));

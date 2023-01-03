@@ -41,7 +41,6 @@
 
 static char g_address[35];  // 34 + \0
 
-
 #ifdef HAVE_BAGL
 
 // Step with icon and text

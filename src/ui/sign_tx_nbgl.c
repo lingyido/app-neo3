@@ -17,7 +17,6 @@
 #include "../shared_context.h"
 #include "sign_tx_common.h"
 
-
 #ifdef HAVE_NBGL
 
 #include "nbgl_fonts.h"
@@ -25,7 +24,6 @@
 #include "nbgl_debug.h"
 #include "nbgl_page.h"
 #include "nbgl_use_case.h"
-
 
 typedef enum item_kind_e {
     SIGNER,
@@ -182,26 +180,30 @@ static void review_final_callback(bool confirmed) {
 
 static void rejectChoice(void) {
     ui_action_validate_transaction(false);
-    nbgl_useCaseStatus("MESSAGE\nREJECTED",false,ui_menu_main);
+    nbgl_useCaseStatus("MESSAGE\nREJECTED", false, ui_menu_main);
 }
 
 static void rejectUseCaseChoice(void) {
-    nbgl_useCaseConfirm("Reject message?",NULL,"Yes, reject","Go back to message",rejectChoice);
+    nbgl_useCaseConfirm("Reject message?", NULL, "Yes, reject", "Go back to message", rejectChoice);
 }
 
 // function called by NBGL to get the current_pair indexed by "index"
-static nbgl_layoutTagValue_t* get_single_action_review_pair(uint8_t index) {
+static nbgl_layoutTagValue_t *get_single_action_review_pair(uint8_t index) {
     if (index < static_items_nb) {
         // No need to copy to dyn_slots as item and value are pointers to static values
         current_pair.item = static_items[index].item;
         current_pair.value = static_items[index].value;
     } else {
         dynamic_item_t *current_item = &dyn_items[index - static_items_nb];
-        signer_t s = G_context.tx_info.transaction.signers[current_item->content.as_item_scope.signer_index];;
+        signer_t s = G_context.tx_info.transaction.signers[current_item->content.as_item_scope.signer_index];
         dynamic_slot_t *slot = &dyn_slots[index % 4];
         switch (current_item->kind) {
             case SIGNER:
-                format_signer(current_item->content.as_item_signer.signer_index, slot->title, sizeof(slot->title), slot->text, sizeof(slot->text));
+                format_signer(current_item->content.as_item_signer.signer_index,
+                              slot->title,
+                              sizeof(slot->title),
+                              slot->text,
+                              sizeof(slot->text));
                 break;
 
             case ACCOUNT:
@@ -213,11 +215,21 @@ static nbgl_layoutTagValue_t* get_single_action_review_pair(uint8_t index) {
                 break;
 
             case CONTRACT:
-                format_contract(&s, current_item->content.as_item_contract.contract_index, slot->title, sizeof(slot->title), slot->text, sizeof(slot->text));
+                format_contract(&s,
+                                current_item->content.as_item_contract.contract_index,
+                                slot->title,
+                                sizeof(slot->title),
+                                slot->text,
+                                sizeof(slot->text));
                 break;
 
             case GROUP:
-                format_group(&s, current_item->content.as_item_group.group_index, slot->title, sizeof(slot->title), slot->text, sizeof(slot->text));
+                format_group(&s,
+                             current_item->content.as_item_group.group_index,
+                             slot->title,
+                             sizeof(slot->title),
+                             slot->text,
+                             sizeof(slot->text));
                 break;
         }
         current_pair.item = slot->title;
@@ -230,7 +242,7 @@ static void start_review(void) {
     layout.nbMaxLinesForValue = 0;
     layout.smallCaseForValue = true;
     layout.wrapping = true;
-    layout.pairs = NULL; // to indicate that callback should be used
+    layout.pairs = NULL;  // to indicate that callback should be used
     layout.callback = get_single_action_review_pair;
     layout.startIndex = 0;
     layout.nbPairs = static_items_nb + dyn_items_nb;
@@ -242,11 +254,12 @@ void start_sign_tx_ui(void) {
     // Prepare steps
     if (create_transaction_flow() != 0) {
         ui_action_validate_transaction(false);
-        nbgl_useCaseConfirm("Arbitrary contract\nscripts are not allowed.",
-                            "Go to Settings menu to enable\nthe signing of such transactions.\n\nThis transaction\nwill be rejected.",
-                            "Go to Settings menu",
-                            "Reject transaction",
-                            ui_menu_settings);
+        nbgl_useCaseConfirm(
+            "Arbitrary contract\nscripts are not allowed.",
+            "Go to Settings menu to enable\nthe signing of such transactions.\n\nThis transaction\nwill be rejected.",
+            "Go to Settings menu",
+            "Reject transaction",
+            ui_menu_settings);
         // TODO: maybe add a mechanism to resume the transaction if the user allows the setting
     } else {
         // start display
@@ -257,7 +270,6 @@ void start_sign_tx_ui(void) {
                                 start_review,
                                 rejectUseCaseChoice);
     }
-
 }
 
 #endif
