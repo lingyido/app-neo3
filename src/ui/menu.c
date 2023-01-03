@@ -156,7 +156,7 @@ static bool settings_nav_callback(uint8_t page, nbgl_pageContent_t *content) {
 }
 
 static void ui_menu_main_nbgl(void);
-static void ui_menu_settings(void);
+void ui_menu_settings(void);
 
 static void settingsControlsCallback(int token, uint8_t index) {
     bool new_setting;
@@ -174,7 +174,7 @@ static void settingsControlsCallback(int token, uint8_t index) {
     }
 }
 
-static void ui_menu_settings(void) {
+void ui_menu_settings(void) {
     G_switches[0].text = "Contract scripts";
     G_switches[0].subText = "Allow contract scripts";
     G_switches[0].token = SWITCH_CONTRACT_DATA_SET_TOKEN;

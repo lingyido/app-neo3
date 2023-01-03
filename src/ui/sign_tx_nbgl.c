@@ -83,17 +83,14 @@ static uint8_t static_items_nb;
 static dynamic_item_t dyn_items[64];
 static uint8_t dyn_items_nb;
 
-static void create_transaction_flow(void) {
+static int create_transaction_flow(void) {
     static_items_nb = 0;
     dyn_items_nb = 0;
 
-    // if (!G_context.tx_info.transaction.is_system_asset_transfer && !G_context.tx_info.transaction.is_vote_script &&
-    //     !N_storage.scriptsAllowed) {
-    //     ux_display_transaction_flow[index++] = &ux_display_no_arbitrary_script_step;
-    //     ux_display_transaction_flow[index++] = &ux_display_abort_step;
-    //     ux_display_transaction_flow[index++] = FLOW_END_STEP;
-    //     return;
-    // }
+    if (!G_context.tx_info.transaction.is_system_asset_transfer && !G_context.tx_info.transaction.is_vote_script &&
+        !N_storage.scriptsAllowed) {
+        return -1;
+    }
 
     if (G_context.tx_info.transaction.is_vote_script) {
         if (G_context.tx_info.transaction.is_remove_vote) {
@@ -162,6 +159,8 @@ static void create_transaction_flow(void) {
             ++dyn_items_nb;
         }
     }
+
+    return 0;
 }
 
 static const nbgl_pageInfoLongPress_t review_final_long_press = {
@@ -241,14 +240,24 @@ static void start_review(void) {
 
 void start_sign_tx_ui(void) {
     // Prepare steps
-    create_transaction_flow();
-    // start display
-    nbgl_useCaseReviewStart(&C_icon_neo_n3_64x64,
-                            "Review message to\nsign on Neo N3\nnetwork",
-                            "",
-                            "Reject message",
-                            start_review,
-                            rejectUseCaseChoice);
+    if (create_transaction_flow() != 0) {
+        ui_action_validate_transaction(false);
+        nbgl_useCaseConfirm("Arbitrary contract\nscripts are not allowed.",
+                            "Go to Settings menu to enable\nthe signing of such transactions.\n\nThis transaction\nwill be rejected.",
+                            "Go to Settings menu",
+                            "Reject transaction",
+                            ui_menu_settings);
+        // TODO: maybe add a mechanism to resume the transaction if the user allows the setting
+    } else {
+        // start display
+        nbgl_useCaseReviewStart(&C_icon_neo_n3_64x64,
+                                "Review message to\nsign on Neo N3\nnetwork",
+                                "",
+                                "Reject message",
+                                start_review,
+                                rejectUseCaseChoice);
+    }
+
 }
 
 #endif
