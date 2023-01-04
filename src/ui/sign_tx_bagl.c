@@ -341,7 +341,7 @@ UX_STEP_NOCB(
 
 UX_STEP_CB(ux_display_abort_step,
            pb,
-           ui_action_validate_transaction(false),
+           ui_action_validate_transaction(false, true),
            {
                &C_icon_validate_14,
                "Understood, abort..",
@@ -371,7 +371,7 @@ UX_STEP_INIT(ux_lower_delimiter, NULL, NULL, { display_next_state(false); });
 // Step with approve button
 UX_STEP_CB(ux_display_approve_step,
            pb,
-           ui_action_validate_transaction(true),
+           ui_action_validate_transaction(true, true),
            {
                &C_icon_validate_14,
                "Approve",
@@ -380,7 +380,7 @@ UX_STEP_CB(ux_display_approve_step,
 // Step with reject button
 UX_STEP_CB(ux_display_reject_step,
            pb,
-           ui_action_validate_transaction(false),
+           ui_action_validate_transaction(false, true),
            {
                &C_icon_crossmark,
                "Reject",

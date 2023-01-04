@@ -81,15 +81,11 @@ UX_FLOW(ux_get_pub_key_pubkey_flow,
         &ux_get_pub_key_address_step,
         &ux_get_pub_key_approve_step,
         &ux_get_pub_key_reject_step);
+
 #else
 
-static void callback_match(bool match) {
-    ui_action_validate_pubkey(match);
-    ui_menu_main();
-}
-
 static void ui_get_public_key_nbgl(void) {
-    nbgl_useCaseAddressConfirmation(g_address, callback_match);
+    nbgl_useCaseAddressConfirmation(g_address, ui_action_validate_pubkey);
 }
 
 #endif

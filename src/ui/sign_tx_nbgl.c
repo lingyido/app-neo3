@@ -171,7 +171,7 @@ static const nbgl_pageInfoLongPress_t review_final_long_press = {
 
 static void review_final_callback(bool confirmed) {
     if (confirmed) {
-        ui_action_validate_transaction(true);
+        ui_action_validate_transaction(true, false);
         nbgl_useCaseStatus("MESSAGE\nSIGNED", true, ui_menu_main);
     } else {
         rejectUseCaseChoice();
@@ -179,8 +179,8 @@ static void review_final_callback(bool confirmed) {
 }
 
 static void rejectChoice(void) {
-    ui_action_validate_transaction(false);
-    nbgl_useCaseStatus("MESSAGE\nREJECTED", false, ui_menu_main);
+    ui_action_validate_transaction(false, false);
+    nbgl_useCaseStatus("message\nrejected", false, ui_menu_main);
 }
 
 static void rejectUseCaseChoice(void) {
@@ -250,17 +250,26 @@ static void start_review(void) {
     nbgl_useCaseStaticReview(&layout, &review_final_long_press, "Reject message", review_final_callback);
 }
 
+static void arbitrary_script_rejection_callback(bool confirmed) {
+    ui_action_validate_transaction(false, false);
+    if (confirmed) {
+        ui_menu_settings();
+    } else {
+        ui_menu_main();
+    }
+}
+
 void start_sign_tx_ui(void) {
     // Prepare steps
     if (create_transaction_flow() != 0) {
-        ui_action_validate_transaction(false);
-        nbgl_useCaseConfirm(
+        // TODO: maybe add a mechanism to resume the transaction if the user allows the setting
+        nbgl_useCaseChoice(
+            &C_warning64px,
             "Arbitrary contract\nscripts are not allowed.",
             "Go to Settings menu to enable\nthe signing of such transactions.\n\nThis transaction\nwill be rejected.",
             "Go to Settings menu",
             "Reject transaction",
-            ui_menu_settings);
-        // TODO: maybe add a mechanism to resume the transaction if the user allows the setting
+            arbitrary_script_rejection_callback);
     } else {
         // start display
         nbgl_useCaseReviewStart(&C_icon_neo_n3_64x64,
