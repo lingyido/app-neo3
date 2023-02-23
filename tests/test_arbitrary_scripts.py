@@ -59,7 +59,7 @@ def test_arbitrary_scripts_allowed(backend, firmware, navigator, test_name):
                                                   path=ROOT_SCREENSHOT_PATH,
                                                   test_case_name=test_name + "_0",
                                                   screen_change_before_first_instruction=False)
-    elif backend.firmware.device == "fat":
+    elif backend.firmware.device == "stax":
         nav_ins = [NavIns(NavInsID.USE_CASE_HOME_SETTINGS),
                    NavIns(NavInsID.TOUCH, (350,115)),
                    NavIns(NavInsID.USE_CASE_SETTINGS_MULTI_PAGE_EXIT)]
@@ -76,7 +76,7 @@ def test_arbitrary_scripts_allowed(backend, firmware, navigator, test_name):
                                                       path=ROOT_SCREENSHOT_PATH,
                                                       test_case_name=test_name + "_1")
 
-        elif backend.firmware.device == "fat":
+        elif backend.firmware.device == "stax":
             # Navigate a bit through rejection screens before confirming
             nav_ins = []
             nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
@@ -139,7 +139,7 @@ def test_arbitrary_scripts_refused(backend, firmware, navigator, test_name):
                                                       text="abort",
                                                       path=ROOT_SCREENSHOT_PATH,
                                                       test_case_name=test_name)
-        elif backend.firmware.device == "fat":
+        elif backend.firmware.device == "stax":
             nav_ins = [NavIns(NavInsID.USE_CASE_CHOICE_CONFIRM),
                        NavIns(NavInsID.USE_CASE_SETTINGS_MULTI_PAGE_EXIT)]
             navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_0", nav_ins)
@@ -147,7 +147,7 @@ def test_arbitrary_scripts_refused(backend, firmware, navigator, test_name):
     assert backend.last_async_response.status == 0x6985 # Deny error
     assert backend.last_async_response.data == b""
 
-    if backend.firmware.device == "fat":
+    if backend.firmware.device == "stax":
         with client.sign_vote_tx(bip44_path=bip44_path,
                                  transaction=tx,
                                  network_magic=magic):

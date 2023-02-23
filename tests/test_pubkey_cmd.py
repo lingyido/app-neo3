@@ -26,7 +26,7 @@ def test_get_public_key_confirm_ok(backend, firmware, navigator, test_name):
                                                       text="Approve",
                                                       path=ROOT_SCREENSHOT_PATH,
                                                       test_case_name=test_name)
-        elif backend.firmware.device == "fat":
+        elif backend.firmware.device == "stax":
             nav_ins = []
             # nav_ins.append(NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_SHOW_QR))
             nav_ins.append(NavIns(NavInsID.TOUCH, (197,276)))
@@ -51,7 +51,7 @@ def test_get_public_key_confirm_refused(backend, firmware, navigator, test_name)
                                                       text="Reject",
                                                       path=ROOT_SCREENSHOT_PATH,
                                                       test_case_name=test_name)
-        elif backend.firmware.device == "fat":
+        elif backend.firmware.device == "stax":
             nav_ins = [NavIns(NavInsID.USE_CASE_ADDRESS_CONFIRMATION_CANCEL)]
             navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
 

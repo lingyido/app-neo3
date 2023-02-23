@@ -24,7 +24,7 @@ include $(BOLOS_SDK)/Makefile.defines
 APP_LOAD_PARAMS = --curve secp256r1
 ifeq ($(TARGET_NAME), TARGET_NANOX)
 APP_LOAD_PARAMS += --appFlags 0x200  # APPLICATION_FLAG_BOLOS_SETTINGS
-else ifeq ($(TARGET_NAME), TARGET_FATSTACKS)
+else ifeq ($(TARGET_NAME), TARGET_STAX)
 APP_LOAD_PARAMS += --appFlags 0x200  # APPLICATION_FLAG_BOLOS_SETTINGS
 else
 APP_LOAD_PARAMS += --appFlags 0x000
@@ -40,7 +40,7 @@ APPVERSION   = "$(APPVERSION_M).$(APPVERSION_N).$(APPVERSION_P)"
 
 ifeq ($(TARGET_NAME),TARGET_NANOS)
     ICONNAME=icons/nanos_app_neo.gif
-else ifeq ($(TARGET_NAME),TARGET_FATSTACKS)
+else ifeq ($(TARGET_NAME),TARGET_STAX)
     ICONNAME = icons/stax_app_neo.gif
 else
     ICONNAME=icons/nanox_app_neo.gif
@@ -61,7 +61,7 @@ DEFINES += HAVE_WEBUSB WEBUSB_URL_SIZE_B=0 WEBUSB_URL=""
 DEFINES += UNUSED\(x\)=\(void\)x
 
 # Graphical lib
-ifneq ($(TARGET_NAME),TARGET_FATSTACKS)
+ifneq ($(TARGET_NAME),TARGET_STAX)
     DEFINES += HAVE_BAGL
     DEFINES += HAVE_UX_FLOW
 endif
@@ -69,7 +69,7 @@ endif
 # Bluetooth
 ifeq ($(TARGET_NAME),TARGET_NANOX)
     DEFINES += HAVE_BLE BLE_COMMAND_TIMEOUT_MS=2000 HAVE_BLE_APDU
-else ifeq ($(TARGET_NAME),TARGET_FATSTACKS)
+else ifeq ($(TARGET_NAME),TARGET_STAX)
     DEFINES += HAVE_BLE BLE_COMMAND_TIMEOUT_MS=2000 HAVE_BLE_APDU
 endif
 
@@ -81,7 +81,7 @@ else
 endif
 
 # Additional graphical defines
-ifeq ($(TARGET_NAME),TARGET_FATSTACKS)
+ifeq ($(TARGET_NAME),TARGET_STAX)
     DEFINES += NBGL_QRCODE
 else ifneq ($(TARGET_NAME),TARGET_NANOS)
     DEFINES += HAVE_GLO096
@@ -130,16 +130,16 @@ include $(BOLOS_SDK)/Makefile.glyphs
 APP_SOURCE_PATH += src
 SDK_SOURCE_PATH += lib_stusb lib_stusb_impl
 
-ifeq ($(TARGET_NAME),TARGET_FATSTACKS)
+ifeq ($(TARGET_NAME),TARGET_STAX)
 SDK_SOURCE_PATH  += lib_nbgl/src
-SDK_SOURCE_PATH  += lib_ux_fatstacks
+SDK_SOURCE_PATH  += lib_ux_stax
 else
 SDK_SOURCE_PATH  += lib_ux
 endif
 
 ifeq ($(TARGET_NAME),TARGET_NANOX)
     SDK_SOURCE_PATH += lib_blewbxx lib_blewbxx_impl
-else ifeq ($(TARGET_NAME),TARGET_FATSTACKS)
+else ifeq ($(TARGET_NAME),TARGET_STAX)
     SDK_SOURCE_PATH += lib_blewbxx lib_blewbxx_impl
 endif
 

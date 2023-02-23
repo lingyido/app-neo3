@@ -74,7 +74,7 @@ def test_sign_tx(backend, firmware, navigator, test_name):
                                                       path=ROOT_SCREENSHOT_PATH,
                                                       test_case_name=test_name)
 
-        elif backend.firmware.device == "fat":
+        elif backend.firmware.device == "stax":
             # Navigate a bit through rejection screens before confirming
             nav_ins = []
             nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
@@ -150,7 +150,7 @@ def test_sign_vote_script_tx(backend, firmware, navigator, test_name):
                                                       path=ROOT_SCREENSHOT_PATH,
                                                       test_case_name=test_name)
 
-        elif backend.firmware.device == "fat":
+        elif backend.firmware.device == "stax":
             # Navigate a bit through rejection screens before confirming
             nav_ins = []
             nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
