@@ -53,16 +53,16 @@ def test_arbitrary_scripts_allowed(backend, firmware, navigator, test_name):
 
     # Change setting
     if backend.firmware.device.startswith("nano"):
-        navigator.navigate_until_text_and_compare(navigate_instruction=NavIns(NavInsID.RIGHT_CLICK),
-                                                  validation_instructions=[NavIns(NavInsID.BOTH_CLICK), NavIns(NavInsID.BOTH_CLICK)],
+        navigator.navigate_until_text_and_compare(navigate_instruction=NavInsID.RIGHT_CLICK,
+                                                  validation_instructions=[NavInsID.BOTH_CLICK, NavInsID.BOTH_CLICK],
                                                   text="Setting",
                                                   path=ROOT_SCREENSHOT_PATH,
                                                   test_case_name=test_name + "_0",
                                                   screen_change_before_first_instruction=False)
     elif backend.firmware.device == "stax":
-        nav_ins = [NavIns(NavInsID.USE_CASE_HOME_SETTINGS),
+        nav_ins = [NavInsID.USE_CASE_HOME_SETTINGS,
                    NavIns(NavInsID.TOUCH, (350,115)),
-                   NavIns(NavInsID.USE_CASE_SETTINGS_MULTI_PAGE_EXIT)]
+                   NavInsID.USE_CASE_SETTINGS_MULTI_PAGE_EXIT]
         navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_0", nav_ins, screen_change_before_first_instruction=False)
 
     with client.sign_vote_tx(bip44_path=bip44_path,
@@ -70,8 +70,8 @@ def test_arbitrary_scripts_allowed(backend, firmware, navigator, test_name):
                              network_magic=magic):
 
         if backend.firmware.device.startswith("nano"):
-            navigator.navigate_until_text_and_compare(navigate_instruction=NavIns(NavInsID.RIGHT_CLICK),
-                                                      validation_instructions=[NavIns(NavInsID.BOTH_CLICK)],
+            navigator.navigate_until_text_and_compare(navigate_instruction=NavInsID.RIGHT_CLICK,
+                                                      validation_instructions=[NavInsID.BOTH_CLICK],
                                                       text="Approve",
                                                       path=ROOT_SCREENSHOT_PATH,
                                                       test_case_name=test_name + "_1")
@@ -79,17 +79,17 @@ def test_arbitrary_scripts_allowed(backend, firmware, navigator, test_name):
         elif backend.firmware.device == "stax":
             # Navigate a bit through rejection screens before confirming
             nav_ins = []
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen 0
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen 1
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen 2
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen 3
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen approve?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_PREVIOUS)) # screen 3
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen approve?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen approve?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_CONFIRM))
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
+            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen 0
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen 1
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen 2
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen 3
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_PREVIOUS) # screen 3
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
+            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_CONFIRM)
 
             navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_1", nav_ins)
 
@@ -134,14 +134,14 @@ def test_arbitrary_scripts_refused(backend, firmware, navigator, test_name):
                              network_magic=magic):
 
         if backend.firmware.device.startswith("nano"):
-            navigator.navigate_until_text_and_compare(navigate_instruction=NavIns(NavInsID.RIGHT_CLICK),
-                                                      validation_instructions=[NavIns(NavInsID.BOTH_CLICK)],
+            navigator.navigate_until_text_and_compare(navigate_instruction=NavInsID.RIGHT_CLICK,
+                                                      validation_instructions=[NavInsID.BOTH_CLICK],
                                                       text="abort",
                                                       path=ROOT_SCREENSHOT_PATH,
                                                       test_case_name=test_name)
         elif backend.firmware.device == "stax":
-            nav_ins = [NavIns(NavInsID.USE_CASE_CHOICE_CONFIRM),
-                       NavIns(NavInsID.USE_CASE_SETTINGS_MULTI_PAGE_EXIT)]
+            nav_ins = [NavInsID.USE_CASE_CHOICE_CONFIRM,
+                       NavInsID.USE_CASE_SETTINGS_MULTI_PAGE_EXIT]
             navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_0", nav_ins)
 
     assert backend.last_async_response.status == 0x6985 # Deny error
@@ -151,7 +151,7 @@ def test_arbitrary_scripts_refused(backend, firmware, navigator, test_name):
         with client.sign_vote_tx(bip44_path=bip44_path,
                                  transaction=tx,
                                  network_magic=magic):
-            nav_ins = [NavIns(NavInsID.USE_CASE_CHOICE_REJECT)]
+            nav_ins = [NavInsID.USE_CASE_CHOICE_REJECT]
             navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_1", nav_ins, screen_change_before_first_instruction=False)
 
             assert backend.last_async_response.status == 0x6985 # Deny error

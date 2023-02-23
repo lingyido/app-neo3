@@ -15,7 +15,7 @@ from neo3 import contracts, vm
 from neo3.wallet.utils import address_to_script_hash
 from neo3.api.wrappers import NeoToken
 
-from ragger.navigator import NavInsID, NavIns
+from ragger.navigator import NavInsID
 
 ROOT_SCREENSHOT_PATH = Path(__file__).parent.resolve()
 
@@ -68,27 +68,28 @@ def test_sign_tx(backend, firmware, navigator, test_name):
                         network_magic=magic):
 
         if backend.firmware.device.startswith("nano"):
-            navigator.navigate_until_text_and_compare(navigate_instruction=NavIns(NavInsID.RIGHT_CLICK),
-                                                      validation_instructions=[NavIns(NavInsID.BOTH_CLICK)],
+            navigator.navigate_until_text_and_compare(navigate_instruction=NavInsID.RIGHT_CLICK,
+                                                      validation_instructions=[NavInsID.BOTH_CLICK],
                                                       text="Approve",
                                                       path=ROOT_SCREENSHOT_PATH,
-                                                      test_case_name=test_name)
+                                                      test_case_name=test_name,
+                                                      timeout=120)
 
         elif backend.firmware.device == "stax":
             # Navigate a bit through rejection screens before confirming
             nav_ins = []
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen 0
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
+            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen 0
             for _ in range(4):
-                nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))  # screen 4
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_PREVIOUS)) # screen 3
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen 3
+                nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)  # screen 4
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_PREVIOUS) # screen 3
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
+            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen 3
             for _ in range(11):
-                nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))  # screen approve?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen approve?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_CONFIRM))
+                nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)  # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
+            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_CONFIRM)
 
             navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
 
@@ -144,8 +145,8 @@ def test_sign_vote_script_tx(backend, firmware, navigator, test_name):
                              network_magic=magic):
 
         if backend.firmware.device.startswith("nano"):
-            navigator.navigate_until_text_and_compare(navigate_instruction=NavIns(NavInsID.RIGHT_CLICK),
-                                                      validation_instructions=[NavIns(NavInsID.BOTH_CLICK)],
+            navigator.navigate_until_text_and_compare(navigate_instruction=NavInsID.RIGHT_CLICK,
+                                                      validation_instructions=[NavInsID.BOTH_CLICK],
                                                       text="Approve",
                                                       path=ROOT_SCREENSHOT_PATH,
                                                       test_case_name=test_name)
@@ -153,17 +154,17 @@ def test_sign_vote_script_tx(backend, firmware, navigator, test_name):
         elif backend.firmware.device == "stax":
             # Navigate a bit through rejection screens before confirming
             nav_ins = []
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen 0
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen 1
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen 2
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen 3
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen approve?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_PREVIOUS)) # screen 3
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_TAP))      # screen approve?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_REJECT))   # screen reject?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_CHOICE_REJECT))   # screen approve?
-            nav_ins.append(NavIns(NavInsID.USE_CASE_REVIEW_CONFIRM))
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
+            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen 0
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen 1
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen 2
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen 3
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_PREVIOUS) # screen 3
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
+            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_CONFIRM)
 
             navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
 
