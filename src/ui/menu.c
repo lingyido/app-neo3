@@ -155,7 +155,7 @@ static bool settings_nav_callback(uint8_t page, nbgl_pageContent_t* content) {
 static void ui_menu_main_nbgl(void);
 void ui_menu_settings(void);
 
-static void settingsControlsCallback(int token, uint8_t index) {
+static void settings_controls_callback(int token, uint8_t index) {
     bool new_setting;
     UNUSED(index);
     switch (token) {
@@ -163,7 +163,6 @@ static void settingsControlsCallback(int token, uint8_t index) {
             G_switches[0].initState = !(G_switches[0].initState);
             new_setting = (G_switches[0].initState == ON_STATE);
             nvm_write((void*) &N_storage.scriptsAllowed, &new_setting, 1);
-            ui_menu_settings();
             break;
         default:
             PRINTF("Should not happen !");
@@ -187,7 +186,7 @@ void ui_menu_settings(void) {
                          false,
                          ui_menu_main_nbgl,
                          settings_nav_callback,
-                         settingsControlsCallback);
+                         settings_controls_callback);
 }
 
 static void ui_menu_main_nbgl(void) {
