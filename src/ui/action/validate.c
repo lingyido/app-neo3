@@ -25,14 +25,16 @@
 #include "../../globals.h"
 #include "../../helper/send_response.h"
 
-void ui_action_validate_pubkey(bool approved) {
+void ui_action_validate_pubkey(bool approved, bool go_back_to_menu) {
     if (approved) {
         helper_send_response_pubkey();
     } else {
         io_send_sw(SW_DENY);
     }
 
-    ui_menu_main();
+    if (go_back_to_menu) {
+        ui_menu_main();
+    }
 }
 
 void ui_action_validate_transaction(bool approved, bool go_back_to_menu) {
