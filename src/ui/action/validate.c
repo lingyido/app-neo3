@@ -18,12 +18,12 @@
 #include <stdbool.h>  // bool
 
 #include "validate.h"
-#include "../menu.h"
-#include "../../sw.h"
-#include "../../io.h"
-#include "../../crypto.h"
-#include "../../globals.h"
-#include "../../helper/send_response.h"
+#include "menu.h"
+#include "sw.h"
+#include "io.h"
+#include "crypto.h"
+#include "globals.h"
+#include "helper/send_response.h"
 
 void ui_action_validate_pubkey(bool approved, bool go_back_to_menu) {
     if (approved) {

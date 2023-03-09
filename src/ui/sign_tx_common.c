@@ -6,15 +6,15 @@
 #include "glyphs.h"
 
 #include "constants.h"
-#include "../globals.h"
-#include "../io.h"
-#include "../sw.h"
+#include "globals.h"
+#include "io.h"
+#include "sw.h"
 #include "action/validate.h"
-#include "../transaction/types.h"
-#include "../common/format.h"
+#include "transaction/types.h"
+#include "common/format.h"
 #include "utils.h"
 #include "menu.h"
-#include "../shared_context.h"
+#include "shared_context.h"
 #include "sign_tx_common.h"
 
 global_item_storage_t G_tx;

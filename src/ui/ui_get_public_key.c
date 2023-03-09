@@ -25,15 +25,15 @@
 
 #include "ui_get_public_key.h"
 #include "constants.h"
-#include "../globals.h"
-#include "../io.h"
-#include "../sw.h"
+#include "globals.h"
+#include "io.h"
+#include "sw.h"
 #include "action/validate.h"
-#include "../transaction/types.h"
-#include "../common/format.h"
+#include "transaction/types.h"
+#include "common/format.h"
 #include "utils.h"
 #include "menu.h"
-#include "../shared_context.h"
+#include "shared_context.h"
 
 #ifdef HAVE_NBGL
 #include "nbgl_use_case.h"

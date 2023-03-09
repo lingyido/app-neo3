@@ -20,8 +20,8 @@
 #include "ux.h"
 #include "glyphs.h"
 
-#include "../globals.h"
-#include "../shared_context.h"
+#include "globals.h"
+#include "shared_context.h"
 #include "menu.h"
 #include "utils.h"
 
