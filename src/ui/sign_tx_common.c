@@ -93,7 +93,7 @@ int start_sign_tx(void) {
         PRINTF("Destination address: %s\n", G_tx.dst_address);
 
         memset(G_tx.token_amount, 0, sizeof(G_tx.token_amount));
-        char token_amount[30] = {0};
+        char token_amount[sizeof(G_tx.token_amount)] = {0};
         if (!format_fpu64(token_amount,
                           sizeof(token_amount),
                           (uint64_t) G_context.tx_info.transaction.amount,
@@ -126,7 +126,7 @@ int start_sign_tx(void) {
     // System fee is a value multiplied by 100_000_000 to create 8 decimals stored in an int.
     // It is not allowed to be negative so we can safely cast it to uint64_t
     memset(G_tx.system_fee, 0, sizeof(G_tx.system_fee));
-    char system_fee[30] = {0};
+    char system_fee[sizeof(G_tx.system_fee)] = {0};
     if (!format_fpu64(system_fee, sizeof(system_fee), (uint64_t) G_context.tx_info.transaction.system_fee, 8)) {
         return io_send_sw(SW_DISPLAY_SYSTEM_FEE_FAIL);
     }
@@ -135,7 +135,7 @@ int start_sign_tx(void) {
 
     // Network fee is stored in a similar fashion as system fee above
     memset(G_tx.network_fee, 0, sizeof(G_tx.network_fee));
-    char network_fee[30] = {0};
+    char network_fee[sizeof(G_tx.network_fee)] = {0};
     if (!format_fpu64(network_fee, sizeof(network_fee), (uint64_t) G_context.tx_info.transaction.network_fee, 8)) {
         return io_send_sw(SW_DISPLAY_NETWORK_FEE_FAIL);
     }
@@ -143,7 +143,7 @@ int start_sign_tx(void) {
     PRINTF("Network fee: %s GAS\n", network_fee);
 
     memset(G_tx.total_fees, 0, sizeof(G_tx.total_fees));
-    char total_fee[30] = {0};
+    char total_fee[sizeof(G_tx.total_fees)] = {0};
     // Note that network_fee and system_fee are actually int64 and can't be less than 0 (as guarded by
     // transaction_deserialize())
     if (!format_fpu64(total_fee,

@@ -2,21 +2,30 @@
 
 #include "types.h"
 
+// number of steps in create_transaction_flow() for BAGL
 #define MAX_NUM_STEPS 13
 
+// uint32 (=max 10 chars) + \0
+#define UINT32_STRING_SIZE 11
+
+// Target network the tx in tended for ("MainNet", "TestNet" or uint32 network number for private nets)
+#define NETWORK_NAME_MAX_SIZE 11
+
+// ticker + uint64 (=max 20 chars) + \0
+#define AMOUNTS_MAX_SIZE 30
+
+// 33 bytes public key as hex + \0
+#define VOTE_TO_SIZE (ECPOINT_LEN * 2 + 1)
+
 typedef struct global_item_storage_s {
-    // 34 + \0
-    char dst_address[35];
-    char system_fee[30];
-    char network_fee[30];
-    char total_fees[30];
-    char token_amount[30];
-    // 33 bytes public key + \0
-    char vote_to[67];
-    // Target network the tx in tended for ("MainNet", "TestNet" or uint32 network number for private nets)
-    char network[11];
-    // uint32 (=max 10 chars) + \0
-    char valid_until_block[11];
+    char dst_address[ADDRESS_LEN + 1];
+    char system_fee[AMOUNTS_MAX_SIZE];
+    char network_fee[AMOUNTS_MAX_SIZE];
+    char total_fees[AMOUNTS_MAX_SIZE];
+    char token_amount[AMOUNTS_MAX_SIZE];
+    char vote_to[VOTE_TO_SIZE];
+    char network[NETWORK_NAME_MAX_SIZE];
+    char valid_until_block[UINT32_STRING_SIZE];
 } global_item_storage_t;
 
 extern global_item_storage_t G_tx;

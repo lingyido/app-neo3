@@ -1,3 +1,5 @@
+#ifdef HAVE_NBGL
+
 #include <stdbool.h>  // bool
 #include <string.h>   // memset
 
@@ -17,12 +19,6 @@
 #include "shared_context.h"
 #include "sign_tx_common.h"
 
-#ifdef HAVE_NBGL
-
-#include "nbgl_fonts.h"
-#include "nbgl_front.h"
-#include "nbgl_debug.h"
-#include "nbgl_page.h"
 #include "nbgl_use_case.h"
 
 typedef enum item_kind_e {
@@ -71,24 +67,25 @@ typedef struct dynamic_slot_s {
     char text[64];
 } dynamic_slot_t;
 
+// We will display at most 4 items on a Stax review screen
+#define MAX_SIMULTANEOUS_DISPLAYED_SLOTS 4
+
+// We can prepare up to 256 items for dynamic display, ie 64 additional dynamic screens
+#define DYNAMICALLY_PREPARED_ITEMS 256
+
 static void start_review(void);
 static void rejectUseCaseChoice(void);
 static nbgl_layoutTagValueList_t layout;
 static nbgl_layoutTagValue_t current_pair;
 static nbgl_layoutTagValue_t static_items[MAX_NUM_STEPS + 1];
-static dynamic_slot_t dyn_slots[4];
+static dynamic_slot_t dyn_slots[MAX_SIMULTANEOUS_DISPLAYED_SLOTS];
 static uint8_t static_items_nb;
-static dynamic_item_t dyn_items[64];
+static dynamic_item_t dyn_items[DYNAMICALLY_PREPARED_ITEMS];
 static uint8_t dyn_items_nb;
 
-static int create_transaction_flow(void) {
+static void create_transaction_flow(void) {
     static_items_nb = 0;
     dyn_items_nb = 0;
-
-    if (!G_context.tx_info.transaction.is_system_asset_transfer && !G_context.tx_info.transaction.is_vote_script &&
-        !N_storage.scriptsAllowed) {
-        return -1;
-    }
 
     if (G_context.tx_info.transaction.is_vote_script) {
         if (G_context.tx_info.transaction.is_remove_vote) {
@@ -157,8 +154,6 @@ static int create_transaction_flow(void) {
             ++dyn_items_nb;
         }
     }
-
-    return 0;
 }
 
 static const nbgl_pageInfoLongPress_t review_final_long_press = {
@@ -196,7 +191,7 @@ static nbgl_layoutTagValue_t *get_single_action_review_pair(uint8_t index) {
     } else {
         dynamic_item_t *current_item = &dyn_items[index - static_items_nb];
         signer_t s = G_context.tx_info.transaction.signers[current_item->content.as_item_scope.signer_index];
-        dynamic_slot_t *slot = &dyn_slots[index % 4];
+        dynamic_slot_t *slot = &dyn_slots[index % sizeof(dyn_slots)];
         switch (current_item->kind) {
             case SIGNER:
                 format_signer(current_item->content.as_item_signer.signer_index,
@@ -260,17 +255,19 @@ static void arbitrary_script_rejection_callback(bool confirmed) {
 }
 
 void start_sign_tx_ui(void) {
-    // Prepare steps
-    if (create_transaction_flow() != 0) {
+    if (!G_context.tx_info.transaction.is_system_asset_transfer && !G_context.tx_info.transaction.is_vote_script &&
+        !N_storage.scriptsAllowed) {
         // TODO: maybe add a mechanism to resume the transaction if the user allows the setting
         nbgl_useCaseChoice(
             &C_warning64px,
             "Arbitrary contract\nscripts are not allowed.",
             "Go to Settings menu to enable\nthe signing of such transactions.\n\nThis transaction\nwill be rejected.",
             "Go to Settings menu",
-            "Reject transaction",
+            "Go to Home screen",
             arbitrary_script_rejection_callback);
     } else {
+        // Prepare steps
+        create_transaction_flow();
         // start display
         nbgl_useCaseReviewStart(&C_icon_neo_n3_64x64,
                                 "Review message to\nsign on Neo N3\nnetwork",

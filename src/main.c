@@ -30,10 +30,6 @@
 #include "apdu/parser.h"
 #include "apdu/dispatcher.h"
 
-#ifdef HAVE_NBGL
-#include "nbgl_page.h"
-#endif
-
 uint8_t G_io_seproxyhal_spi_buffer[IO_SEPROXYHAL_BUFFER_SIZE_B];
 io_state_e G_io_state;
 ux_state_t G_ux;
@@ -42,10 +38,6 @@ global_ctx_t G_context;
 
 settings_strings_t strings;
 const internalStorage_t N_storage_real;
-
-#ifdef HAVE_NBGL
-nbgl_page_t *pageContext;
-#endif
 
 /**
  * Handle APDU command received and send back APDU response using handlers.

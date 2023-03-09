@@ -26,10 +26,6 @@
 #include "utils.h"
 
 #ifdef HAVE_NBGL
-#include "nbgl_fonts.h"
-#include "nbgl_front.h"
-#include "nbgl_debug.h"
-#include "nbgl_page.h"
 #include "nbgl_use_case.h"
 #endif
 
@@ -121,10 +117,9 @@ static void ui_menu_about() {
 #else
 
 static const char* const info_types[] = {"Version", APPNAME};
-static const char* const info_contents[] = {APPVERSION, "(c) 2022 Ledger"};
+static const char* const info_contents[] = {APPVERSION, "(c) 2021 COZ Inc"};
 
 static void quit_app_callback(void) {
-    releaseContext();
     os_sched_exit(-1);
 }
 
