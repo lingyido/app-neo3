@@ -70,9 +70,6 @@ typedef struct dynamic_slot_s {
 // We will display at most 4 items on a Stax review screen
 #define MAX_SIMULTANEOUS_DISPLAYED_SLOTS 4
 
-// We can prepare up to 256 items for dynamic display, ie 64 additional dynamic screens
-#define DYNAMICALLY_PREPARED_ITEMS 256
-
 static void start_review(void);
 static void rejectUseCaseChoice(void);
 static nbgl_layoutTagValueList_t layout;
@@ -80,7 +77,9 @@ static nbgl_layoutTagValue_t current_pair;
 static nbgl_layoutTagValue_t static_items[MAX_NUM_STEPS + 1];
 static dynamic_slot_t dyn_slots[MAX_SIMULTANEOUS_DISPLAYED_SLOTS];
 static uint8_t static_items_nb;
-static dynamic_item_t dyn_items[DYNAMICALLY_PREPARED_ITEMS];
+// Reserve space for preparing the dynamic items (signer) display. At the moment 42 elements max
+static dynamic_item_t
+    dyn_items[MAX_TX_SIGNERS * (3 + MAX_SIGNER_ALLOWED_CONTRACTS * 1 + MAX_SIGNER_ALLOWED_GROUPS * 1)];
 static uint8_t dyn_items_nb;
 
 static void create_transaction_flow(void) {
@@ -129,6 +128,8 @@ static void create_transaction_flow(void) {
     static_items[static_items_nb].value = G_tx.valid_until_block;
     ++static_items_nb;
 
+    // dyn_items size is tailored to fit the worst case scenario
+    // if the number of element is too big for the array it would have triggered a parsing error
     for (int i = 0; i < G_context.tx_info.transaction.signers_size; ++i) {
         dyn_items[dyn_items_nb].kind = SIGNER;
         dyn_items[dyn_items_nb].content.as_item_signer.signer_index = i;
