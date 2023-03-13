@@ -24,14 +24,14 @@
 #include "cx.h"
 
 #include "sign_tx.h"
-#include "../sw.h"
-#include "../globals.h"
-#include "../crypto.h"
-#include "../ui/display.h"
-#include "../common/buffer.h"
-#include "../common/bip44.h"
-#include "../transaction/types.h"
-#include "../transaction/deserialize.h"
+#include "sign_tx_common.h"
+#include "sw.h"
+#include "globals.h"
+#include "crypto.h"
+#include "common/buffer.h"
+#include "common/bip44.h"
+#include "transaction/types.h"
+#include "transaction/deserialize.h"
 
 int handler_sign_tx(buffer_t *cdata, uint8_t chunk, bool more) {
     if (chunk == 0) {  // First APDU, parse BIP44 path
@@ -107,7 +107,12 @@ int handler_sign_tx(buffer_t *cdata, uint8_t chunk, bool more) {
 
             PRINTF("Hash: %.*H\n", sizeof(G_context.tx_info.hash), G_context.tx_info.hash);
 
-            return ui_display_transaction();
+            if (G_context.req_type != CONFIRM_TRANSACTION || G_context.state != STATE_PARSED) {
+                G_context.state = STATE_NONE;
+                return io_send_sw(SW_BAD_STATE);
+            }
+
+            return start_sign_tx();
         }
     }
 
