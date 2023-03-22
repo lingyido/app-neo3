@@ -192,7 +192,7 @@ static nbgl_layoutTagValue_t *get_single_action_review_pair(uint8_t index) {
     } else {
         dynamic_item_t *current_item = &dyn_items[index - static_items_nb];
         signer_t s = G_context.tx_info.transaction.signers[current_item->content.as_item_scope.signer_index];
-        dynamic_slot_t *slot = &dyn_slots[index % sizeof(dyn_slots)];
+        dynamic_slot_t *slot = &dyn_slots[index % ARRAY_COUNT(dyn_slots)];
         switch (current_item->kind) {
             case SIGNER:
                 format_signer(current_item->content.as_item_signer.signer_index,
