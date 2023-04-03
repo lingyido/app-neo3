@@ -30,7 +30,7 @@
 #include "crypto.h"
 #include "common/buffer.h"
 #include "common/bip44.h"
-#include "transaction/types.h"
+#include "transaction/transaction_types.h"
 #include "transaction/deserialize.h"
 
 int handler_sign_tx(buffer_t *cdata, uint8_t chunk, bool more) {
