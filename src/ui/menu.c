@@ -116,7 +116,7 @@ static void ui_menu_about() {
 
 #else
 
-static const char* const info_types[] = {"Version", APPNAME};
+static const char* const info_types[] = {"Version", DISPLAYABLE_APPNAME};
 static const char* const info_contents[] = {APPVERSION, "(c) 2021 COZ Inc"};
 
 static void quit_app_callback(void) {
@@ -175,7 +175,7 @@ void ui_menu_settings(void) {
     } else {
         G_switches[0].initState = OFF_STATE;
     }
-    nbgl_useCaseSettings(APPNAME " settings",
+    nbgl_useCaseSettings(DISPLAYABLE_APPNAME " settings",
                          0,
                          2,
                          false,
@@ -185,9 +185,9 @@ void ui_menu_settings(void) {
 }
 
 static void ui_menu_main_nbgl(void) {
-    nbgl_useCaseHome(APPNAME,
+    nbgl_useCaseHome(DISPLAYABLE_APPNAME,
                      &C_icon_neo_n3_64x64,
-                     "This app confirms actions on\nthe " APPNAME " network.",
+                     "This app confirms actions on\nthe " DISPLAYABLE_APPNAME " network.",
                      true,
                      ui_menu_settings,
                      quit_app_callback);
