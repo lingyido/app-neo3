@@ -259,13 +259,13 @@ void start_sign_tx_ui(void) {
     if (!G_context.tx_info.transaction.is_system_asset_transfer && !G_context.tx_info.transaction.is_vote_script &&
         !N_storage.scriptsAllowed) {
         // TODO: maybe add a mechanism to resume the transaction if the user allows the setting
-        nbgl_useCaseChoice(
-            &C_warning64px,
-            "Arbitrary contract\nscripts are not allowed.",
-            "Go to Settings menu to enable\nthe signing of such transactions.\n\nThis transaction\nwill be rejected.",
-            "Go to Settings menu",
-            "Go to Home screen",
-            arbitrary_script_rejection_callback);
+        nbgl_useCaseChoice(&C_warning64px,
+                           "Arbitrary contract\nscripts are not allowed.",
+                           "Go to the Settings menu to\nenable the signing of such\ntransactions.\n\nThis "
+                           "transaction\nwill be rejected.",
+                           "Go to Settings menu",
+                           "Go to Home screen",
+                           arbitrary_script_rejection_callback);
     } else {
         // Prepare steps
         create_transaction_flow();
