@@ -48,6 +48,7 @@ uint8_t io_event(uint8_t channel __attribute__((unused))) {
                 THROW(EXCEPTION_IO_RESET);
             }
             /* fallthrough */
+            __attribute__((fallthrough));
         case SEPROXYHAL_TAG_DISPLAY_PROCESSED_EVENT:
 #ifdef HAVE_BAGL
             UX_DISPLAYED_EVENT({});

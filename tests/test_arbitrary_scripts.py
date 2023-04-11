@@ -77,21 +77,11 @@ def test_arbitrary_scripts_allowed(backend, firmware, navigator, test_name):
                                                       test_case_name=test_name + "_1")
 
         elif backend.firmware.device == "stax":
-            # Navigate a bit through rejection screens before confirming
-            nav_ins = []
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
-            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen 0
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen 1
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen 2
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen 3
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen approve?
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_PREVIOUS) # screen 3
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen approve?
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
-            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen approve?
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_CONFIRM)
-
-            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_1", nav_ins)
+            navigator.navigate_until_text_and_compare(NavInsID.USE_CASE_REVIEW_TAP,
+                                                      [NavInsID.USE_CASE_REVIEW_CONFIRM, NavInsID.USE_CASE_STATUS_DISMISS],
+                                                      "Hold to sign",
+                                                      ROOT_SCREENSHOT_PATH,
+                                                      test_name + "_1")
 
     der_sig = backend.last_async_response.data
 
@@ -152,7 +142,7 @@ def test_arbitrary_scripts_refused(backend, firmware, navigator, test_name):
                                  transaction=tx,
                                  network_magic=magic):
             nav_ins = [NavInsID.USE_CASE_CHOICE_REJECT]
-            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_1", nav_ins, screen_change_before_first_instruction=False)
+            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_1", nav_ins)
 
             assert backend.last_async_response.status == 0x6985 # Deny error
             assert backend.last_async_response.data == b""

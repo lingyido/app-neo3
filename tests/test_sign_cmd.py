@@ -72,26 +72,14 @@ def test_sign_tx(backend, firmware, navigator, test_name):
                                                       validation_instructions=[NavInsID.BOTH_CLICK],
                                                       text="Approve",
                                                       path=ROOT_SCREENSHOT_PATH,
-                                                      test_case_name=test_name,
-                                                      timeout=120)
+                                                      test_case_name=test_name)
 
         elif backend.firmware.device == "stax":
-            # Navigate a bit through rejection screens before confirming
-            nav_ins = []
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
-            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen 0
-            for _ in range(4):
-                nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)  # screen 4
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_PREVIOUS) # screen 3
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
-            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen 3
-            for _ in range(11):
-                nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)  # screen approve?
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
-            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen approve?
-            nav_ins.append(NavInsID.USE_CASE_REVIEW_CONFIRM)
-
-            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+            navigator.navigate_until_text_and_compare(NavInsID.USE_CASE_REVIEW_TAP,
+                                                      [NavInsID.USE_CASE_REVIEW_CONFIRM, NavInsID.USE_CASE_STATUS_DISMISS],
+                                                      "Hold to sign",
+                                                      ROOT_SCREENSHOT_PATH,
+                                                      test_name)
 
     der_sig = backend.last_async_response.data
 

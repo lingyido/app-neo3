@@ -87,7 +87,7 @@ def test_parser_codes():
     # path with tests
     conftest_folder_path: Path = Path(__file__).parent
     # types.h should be in src/types.h
-    types_h_path = conftest_folder_path.parent / "src" / "transaction" / "types.h"
+    types_h_path = conftest_folder_path.parent / "src" / "transaction" / "transaction_types.h"
 
     expected_parser_codes: List[Tuple[str, int]] = parse_parser_codes(types_h_path)
     for name, value in expected_parser_codes:

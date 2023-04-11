@@ -12,7 +12,7 @@
 #include "io.h"
 #include "sw.h"
 #include "action/validate.h"
-#include "transaction/types.h"
+#include "transaction/transaction_types.h"
 #include "common/format.h"
 #include "utils.h"
 #include "menu.h"
@@ -192,7 +192,7 @@ static nbgl_layoutTagValue_t *get_single_action_review_pair(uint8_t index) {
     } else {
         dynamic_item_t *current_item = &dyn_items[index - static_items_nb];
         signer_t s = G_context.tx_info.transaction.signers[current_item->content.as_item_scope.signer_index];
-        dynamic_slot_t *slot = &dyn_slots[index % sizeof(dyn_slots)];
+        dynamic_slot_t *slot = &dyn_slots[index % ARRAY_COUNT(dyn_slots)];
         switch (current_item->kind) {
             case SIGNER:
                 format_signer(current_item->content.as_item_signer.signer_index,
@@ -259,13 +259,13 @@ void start_sign_tx_ui(void) {
     if (!G_context.tx_info.transaction.is_system_asset_transfer && !G_context.tx_info.transaction.is_vote_script &&
         !N_storage.scriptsAllowed) {
         // TODO: maybe add a mechanism to resume the transaction if the user allows the setting
-        nbgl_useCaseChoice(
-            &C_warning64px,
-            "Arbitrary contract\nscripts are not allowed.",
-            "Go to Settings menu to enable\nthe signing of such transactions.\n\nThis transaction\nwill be rejected.",
-            "Go to Settings menu",
-            "Go to Home screen",
-            arbitrary_script_rejection_callback);
+        nbgl_useCaseChoice(&C_warning64px,
+                           "Arbitrary contract\nscripts are not allowed.",
+                           "Go to the Settings menu to\nenable the signing of such\ntransactions.\n\nThis "
+                           "transaction\nwill be rejected.",
+                           "Go to Settings menu",
+                           "Go to Home screen",
+                           arbitrary_script_rejection_callback);
     } else {
         // Prepare steps
         create_transaction_flow();

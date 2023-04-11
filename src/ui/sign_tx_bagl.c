@@ -10,7 +10,7 @@
 #include "io.h"
 #include "sw.h"
 #include "action/validate.h"
-#include "transaction/types.h"
+#include "transaction/transaction_types.h"
 #include "common/format.h"
 #include "utils.h"
 #include "menu.h"
