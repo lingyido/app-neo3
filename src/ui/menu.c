@@ -185,12 +185,7 @@ void ui_menu_settings(void) {
 }
 
 static void ui_menu_main_nbgl(void) {
-    nbgl_useCaseHome(DISPLAYABLE_APPNAME,
-                     &C_icon_neo_n3_64x64,
-                     "This app confirms actions on\nthe " DISPLAYABLE_APPNAME " network.",
-                     true,
-                     ui_menu_settings,
-                     quit_app_callback);
+    nbgl_useCaseHome(DISPLAYABLE_APPNAME, &C_icon_neo_n3_64x64, NULL, true, ui_menu_settings, quit_app_callback);
 }
 #endif
 

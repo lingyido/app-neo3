@@ -73,6 +73,7 @@ typedef struct dynamic_slot_s {
 static void start_review(void);
 static void rejectUseCaseChoice(void);
 static nbgl_layoutTagValueList_t layout;
+static nbgl_pageInfoLongPress_t review_final_long_press;
 static nbgl_layoutTagValue_t current_pair;
 static nbgl_layoutTagValue_t static_items[MAX_NUM_STEPS + 1];
 static dynamic_slot_t dyn_slots[MAX_SIMULTANEOUS_DISPLAYED_SLOTS];
@@ -82,30 +83,44 @@ static dynamic_item_t
     dyn_items[MAX_TX_SIGNERS * (3 + MAX_SIGNER_ALLOWED_CONTRACTS * 1 + MAX_SIGNER_ALLOWED_GROUPS * 1)];
 static uint8_t dyn_items_nb;
 
+#define TITLE_RETRACT_VOTE "Review transaction to\nretract vote"
+#define TITLE_CAST_VOTE    "Review transaction to\ncast vote"
+#define TITLE_SEND_NEO     "Review transaction to\nsend NEO"
+#define TITLE_SEND_GAS     "Review transaction to\nsend GAS"
+
+#define MAX4(a, b, c, d) MAX(MAX(a, b), MAX(c, d))
+// UPDATE THIS DEFINE if additional transaction types are added
+#define LONGEST_TITLE_SIZE \
+    MAX4(sizeof(TITLE_RETRACT_VOTE), sizeof(TITLE_CAST_VOTE), sizeof(TITLE_SEND_NEO), sizeof(TITLE_SEND_GAS))
+static char review_title[LONGEST_TITLE_SIZE];
+
 static void create_transaction_flow(void) {
     static_items_nb = 0;
     dyn_items_nb = 0;
 
     if (G_context.tx_info.transaction.is_vote_script) {
         if (G_context.tx_info.transaction.is_remove_vote) {
-            static_items[static_items_nb].item = "Object";
-            static_items[static_items_nb].value = "Retracting vote";
-            ++static_items_nb;
+            review_final_long_press.text = "Sign transaction to\nretract vote";
+            strlcpy(review_title, TITLE_RETRACT_VOTE, sizeof(review_title));
         } else {
-            static_items[static_items_nb].item = "Object";
-            static_items[static_items_nb].value = "Casting vote";
-            ++static_items_nb;
+            review_final_long_press.text = "Sign transaction to\ncast vote";
+            strlcpy(review_title, TITLE_CAST_VOTE, sizeof(review_title));
         }
     } else if (G_context.tx_info.transaction.is_system_asset_transfer) {
-        static_items[static_items_nb].item = "Object";
-        static_items[static_items_nb].value = "System asset transfer";
-        ++static_items_nb;
-        static_items[static_items_nb].item = "Destination addr";
+        static_items[static_items_nb].item = "To";
         static_items[static_items_nb].value = G_tx.dst_address;
         ++static_items_nb;
         static_items[static_items_nb].item = "Token amount";
         static_items[static_items_nb].value = G_tx.token_amount;
         ++static_items_nb;
+
+        if (G_context.tx_info.transaction.is_neo) {
+            review_final_long_press.text = "Sign transaction to\nsend NEO";
+            strlcpy(review_title, TITLE_SEND_NEO, sizeof(review_title));
+        } else {
+            review_final_long_press.text = "Sign transaction to\nsend GAS";
+            strlcpy(review_title, TITLE_SEND_GAS, sizeof(review_title));
+        }
     }
 
     static_items[static_items_nb].item = "Target network";
@@ -157,14 +172,6 @@ static void create_transaction_flow(void) {
     }
 }
 
-static const nbgl_pageInfoLongPress_t review_final_long_press = {
-    .text = "Sign message on\nNeo N3 network?",
-    .icon = &C_icon_neo_n3_64x64,
-    .longPressText = "Hold to sign",
-    .longPressToken = 0,
-    .tuneId = TUNE_TAP_CASUAL,
-};
-
 static void review_final_callback(bool confirmed) {
     if (confirmed) {
         ui_action_validate_transaction(true, false);
@@ -176,58 +183,63 @@ static void review_final_callback(bool confirmed) {
 
 static void rejectChoice(void) {
     ui_action_validate_transaction(false, false);
-    nbgl_useCaseStatus("message\nrejected", false, ui_menu_main);
+    nbgl_useCaseStatus("Transaction\nrejected", false, ui_menu_main);
 }
 
 static void rejectUseCaseChoice(void) {
-    nbgl_useCaseConfirm("Reject message?", NULL, "Yes, reject", "Go back to message", rejectChoice);
+    nbgl_useCaseConfirm("Reject transaction?", NULL, "Yes, reject", "Go back to transaction", rejectChoice);
+}
+
+static void format_tag_value(dynamic_slot_t *slot, const dynamic_item_t *item) {
+    signer_t s = G_context.tx_info.transaction.signers[item->content.as_item_scope.signer_index];
+    switch (item->kind) {
+        case SIGNER:
+            format_signer(item->content.as_item_signer.signer_index,
+                          slot->title,
+                          sizeof(slot->title),
+                          slot->text,
+                          sizeof(slot->text));
+            break;
+
+        case ACCOUNT:
+            format_account(&s, slot->title, sizeof(slot->title), slot->text, sizeof(slot->text));
+            break;
+
+        case SCOPE:
+            format_scope(&s, slot->title, sizeof(slot->title), slot->text, sizeof(slot->text));
+            break;
+
+        case CONTRACT:
+            format_contract(&s,
+                            item->content.as_item_contract.contract_index,
+                            slot->title,
+                            sizeof(slot->title),
+                            slot->text,
+                            sizeof(slot->text));
+            break;
+
+        case GROUP:
+            format_group(&s,
+                         item->content.as_item_group.group_index,
+                         slot->title,
+                         sizeof(slot->title),
+                         slot->text,
+                         sizeof(slot->text));
+            break;
+    }
 }
 
 // function called by NBGL to get the current_pair indexed by "index"
 static nbgl_layoutTagValue_t *get_single_action_review_pair(uint8_t index) {
+    current_pair.valueIcon = NULL;
     if (index < static_items_nb) {
         // No need to copy to dyn_slots as item and value are pointers to static values
         current_pair.item = static_items[index].item;
         current_pair.value = static_items[index].value;
     } else {
-        dynamic_item_t *current_item = &dyn_items[index - static_items_nb];
-        signer_t s = G_context.tx_info.transaction.signers[current_item->content.as_item_scope.signer_index];
+        dynamic_item_t *item = &dyn_items[index - static_items_nb];
         dynamic_slot_t *slot = &dyn_slots[index % ARRAY_COUNT(dyn_slots)];
-        switch (current_item->kind) {
-            case SIGNER:
-                format_signer(current_item->content.as_item_signer.signer_index,
-                              slot->title,
-                              sizeof(slot->title),
-                              slot->text,
-                              sizeof(slot->text));
-                break;
-
-            case ACCOUNT:
-                format_account(&s, slot->title, sizeof(slot->title), slot->text, sizeof(slot->text));
-                break;
-
-            case SCOPE:
-                format_scope(&s, slot->title, sizeof(slot->title), slot->text, sizeof(slot->text));
-                break;
-
-            case CONTRACT:
-                format_contract(&s,
-                                current_item->content.as_item_contract.contract_index,
-                                slot->title,
-                                sizeof(slot->title),
-                                slot->text,
-                                sizeof(slot->text));
-                break;
-
-            case GROUP:
-                format_group(&s,
-                             current_item->content.as_item_group.group_index,
-                             slot->title,
-                             sizeof(slot->title),
-                             slot->text,
-                             sizeof(slot->text));
-                break;
-        }
+        format_tag_value(slot, item);
         current_pair.item = slot->title;
         current_pair.value = slot->text;
     }
@@ -236,14 +248,20 @@ static nbgl_layoutTagValue_t *get_single_action_review_pair(uint8_t index) {
 
 static void start_review(void) {
     layout.nbMaxLinesForValue = 0;
-    layout.smallCaseForValue = true;
+    layout.smallCaseForValue = false;
     layout.wrapping = true;
     layout.pairs = NULL;  // to indicate that callback should be used
     layout.callback = get_single_action_review_pair;
     layout.startIndex = 0;
     layout.nbPairs = static_items_nb + dyn_items_nb;
 
-    nbgl_useCaseStaticReview(&layout, &review_final_long_press, "Reject message", review_final_callback);
+    // review_final_long_press.text is handled in create_transaction_flow()
+    review_final_long_press.icon = &C_icon_neo_n3_64x64;
+    review_final_long_press.longPressText = "Hold to sign";
+    review_final_long_press.longPressToken = 0;
+    review_final_long_press.tuneId = TUNE_TAP_CASUAL;
+
+    nbgl_useCaseStaticReview(&layout, &review_final_long_press, "Reject transaction", review_final_callback);
 }
 
 static void arbitrary_script_rejection_callback(bool confirmed) {
@@ -271,9 +289,9 @@ void start_sign_tx_ui(void) {
         create_transaction_flow();
         // start display
         nbgl_useCaseReviewStart(&C_icon_neo_n3_64x64,
-                                "Review message to\nsign on Neo N3\nnetwork",
+                                review_title,
                                 "",
-                                "Reject message",
+                                "Reject transaction",
                                 start_review,
                                 rejectUseCaseChoice);
     }
