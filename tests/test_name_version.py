@@ -6,4 +6,4 @@ def test_get_app_and_version(backend, backend_name, firmware):
     app_name, version = client.get_app_and_version()
 
     assert app_name == "NEO N3"
-    assert version == "0.3.0"
+    assert version == "0.3.1"

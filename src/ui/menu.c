@@ -132,14 +132,14 @@ enum {
 
 static bool settings_nav_callback(uint8_t page, nbgl_pageContent_t* content) {
     if (page == 0) {
-        content->type = SWITCHES_LIST;
-        content->switchesList.nbSwitches = NB_SETTINGS_SWITCHES;
-        content->switchesList.switches = (nbgl_layoutSwitch_t*) G_switches;
-    } else if (page == 1) {
         content->type = INFOS_LIST;
         content->infosList.nbInfos = ARRAY_COUNT(info_types);
-        content->infosList.infoTypes = (const char**) info_types;
-        content->infosList.infoContents = (const char**) info_contents;
+        content->infosList.infoTypes = info_types;
+        content->infosList.infoContents = info_contents;
+    } else if (page == 1) {
+        content->type = SWITCHES_LIST;
+        content->switchesList.nbSwitches = NB_SETTINGS_SWITCHES;
+        content->switchesList.switches = G_switches;
     } else {
         return false;
     }
@@ -185,12 +185,7 @@ void ui_menu_settings(void) {
 }
 
 static void ui_menu_main_nbgl(void) {
-    nbgl_useCaseHome(DISPLAYABLE_APPNAME,
-                     &C_icon_neo_n3_64x64,
-                     "This app confirms actions on\nthe " DISPLAYABLE_APPNAME " network.",
-                     true,
-                     ui_menu_settings,
-                     quit_app_callback);
+    nbgl_useCaseHome(DISPLAYABLE_APPNAME, &C_icon_neo_n3_64x64, NULL, true, ui_menu_settings, quit_app_callback);
 }
 #endif
 

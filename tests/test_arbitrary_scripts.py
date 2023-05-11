@@ -61,6 +61,7 @@ def test_arbitrary_scripts_allowed(backend, firmware, navigator, test_name):
                                                   screen_change_before_first_instruction=False)
     elif backend.firmware.device == "stax":
         nav_ins = [NavInsID.USE_CASE_HOME_SETTINGS,
+                   NavInsID.USE_CASE_SETTINGS_NEXT,
                    NavIns(NavInsID.TOUCH, (350,115)),
                    NavInsID.USE_CASE_SETTINGS_MULTI_PAGE_EXIT]
         navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_0", nav_ins, screen_change_before_first_instruction=False)
