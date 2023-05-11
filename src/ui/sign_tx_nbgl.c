@@ -67,32 +67,19 @@ typedef struct dynamic_slot_s {
     char text[64];
 } dynamic_slot_t;
 
-// We will display at most 4 items on a Stax review screen
-#define MAX_SIMULTANEOUS_DISPLAYED_SLOTS 4
-
 static void start_review(void);
 static void rejectUseCaseChoice(void);
 static nbgl_layoutTagValueList_t layout;
 static nbgl_pageInfoLongPress_t review_final_long_press;
 static nbgl_layoutTagValue_t current_pair;
 static nbgl_layoutTagValue_t static_items[MAX_NUM_STEPS + 1];
-static dynamic_slot_t dyn_slots[MAX_SIMULTANEOUS_DISPLAYED_SLOTS];
+static dynamic_slot_t dyn_slots[NB_MAX_DISPLAYED_PAIRS_IN_REVIEW];
 static uint8_t static_items_nb;
 // Reserve space for preparing the dynamic items (signer) display. At the moment 42 elements max
 static dynamic_item_t
     dyn_items[MAX_TX_SIGNERS * (3 + MAX_SIGNER_ALLOWED_CONTRACTS * 1 + MAX_SIGNER_ALLOWED_GROUPS * 1)];
 static uint8_t dyn_items_nb;
-
-#define TITLE_RETRACT_VOTE "Review transaction to\nretract vote"
-#define TITLE_CAST_VOTE    "Review transaction to\ncast vote"
-#define TITLE_SEND_NEO     "Review transaction to\nsend NEO"
-#define TITLE_SEND_GAS     "Review transaction to\nsend GAS"
-
-#define MAX4(a, b, c, d) MAX(MAX(a, b), MAX(c, d))
-// UPDATE THIS DEFINE if additional transaction types are added
-#define LONGEST_TITLE_SIZE \
-    MAX4(sizeof(TITLE_RETRACT_VOTE), sizeof(TITLE_CAST_VOTE), sizeof(TITLE_SEND_NEO), sizeof(TITLE_SEND_GAS))
-static char review_title[LONGEST_TITLE_SIZE];
+static const char *review_title;
 
 static void create_transaction_flow(void) {
     static_items_nb = 0;
@@ -100,11 +87,11 @@ static void create_transaction_flow(void) {
 
     if (G_context.tx_info.transaction.is_vote_script) {
         if (G_context.tx_info.transaction.is_remove_vote) {
-            review_final_long_press.text = "Sign transaction to\nretract vote";
-            strlcpy(review_title, TITLE_RETRACT_VOTE, sizeof(review_title));
+            review_final_long_press.text = "Sign transaction to\nretract vote?";
+            review_title = "Review transaction to\nretract vote";
         } else {
-            review_final_long_press.text = "Sign transaction to\ncast vote";
-            strlcpy(review_title, TITLE_CAST_VOTE, sizeof(review_title));
+            review_final_long_press.text = "Sign transaction to\ncast vote?";
+            review_title = "Review transaction to\ncast vote";
         }
     } else if (G_context.tx_info.transaction.is_system_asset_transfer) {
         static_items[static_items_nb].item = "To";
@@ -115,12 +102,15 @@ static void create_transaction_flow(void) {
         ++static_items_nb;
 
         if (G_context.tx_info.transaction.is_neo) {
-            review_final_long_press.text = "Sign transaction to\nsend NEO";
-            strlcpy(review_title, TITLE_SEND_NEO, sizeof(review_title));
+            review_final_long_press.text = "Sign transaction to\nsend NEO?";
+            review_title = "Review transaction to\nsend NEO";
         } else {
-            review_final_long_press.text = "Sign transaction to\nsend GAS";
-            strlcpy(review_title, TITLE_SEND_GAS, sizeof(review_title));
+            review_final_long_press.text = "Sign transaction to\nsend GAS?";
+            review_title = "Review transaction to\nsend GAS";
         }
+    } else {
+        review_final_long_press.text = "Sign script?";
+        review_title = "Review transaction\nto sign script";
     }
 
     static_items[static_items_nb].item = "Target network";
@@ -175,7 +165,7 @@ static void create_transaction_flow(void) {
 static void review_final_callback(bool confirmed) {
     if (confirmed) {
         ui_action_validate_transaction(true, false);
-        nbgl_useCaseStatus("MESSAGE\nSIGNED", true, ui_menu_main);
+        nbgl_useCaseStatus("TRANSACTION\nSIGNED", true, ui_menu_main);
     } else {
         rejectUseCaseChoice();
     }
