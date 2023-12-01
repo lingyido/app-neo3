@@ -98,12 +98,12 @@ int handler_sign_tx(buffer_t *cdata, uint8_t chunk, bool more) {
 
             cx_sha256_t tx_hash;
             cx_sha256_init(&tx_hash);
-            cx_hash((cx_hash_t *) &tx_hash,
-                    CX_LAST /*mode*/,
-                    G_context.tx_info.raw_tx /* data in */,
-                    G_context.tx_info.raw_tx_len /* data in len */,
-                    G_context.tx_info.hash /* hash out*/,
-                    sizeof(G_context.tx_info.hash) /* hash out len */);
+            cx_hash_no_throw((cx_hash_t *) &tx_hash,
+                             CX_LAST /*mode*/,
+                             G_context.tx_info.raw_tx /* data in */,
+                             G_context.tx_info.raw_tx_len /* data in len */,
+                             G_context.tx_info.hash /* hash out*/,
+                             sizeof(G_context.tx_info.hash) /* hash out len */);
 
             PRINTF("Hash: %.*H\n", sizeof(G_context.tx_info.hash), G_context.tx_info.hash);
 
