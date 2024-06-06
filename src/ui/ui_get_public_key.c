@@ -102,13 +102,30 @@ static void display_addr(void) {
     nbgl_useCaseAddressConfirmation(g_address, callback_match);
 }
 
+static void review_choice(bool confirm) {
+     ui_action_validate_pubkey(confirm, false);
+    if (confirm) {
+        nbgl_useCaseReviewStatus(STATUS_TYPE_ADDRESS_VERIFIED, ui_menu_main);
+    } else {
+        nbgl_useCaseReviewStatus(STATUS_TYPE_ADDRESS_REJECTED, ui_menu_main);
+    }
+}
+
 static void ui_get_public_key_nbgl(void) {
-    nbgl_useCaseReviewStart(&C_icon_neo_n3_64x64,
+    /*nbgl_useCaseReviewStart(&C_icon_neo_n3_64x64,
                             "Verify " APPNAME "\naddress",
                             NULL,
                             "Cancel",
                             display_addr,
-                            address_verification_cancelled);
+                            address_verification_cancelled);*/
+
+    nbgl_useCaseAddressReview(
+        g_address,
+        NULL,
+        &C_icon_neo_n3_64x64,
+        "Verify " APPNAME "\naddress",
+        NULL,
+        review_choice);
 }
 
 #endif
