@@ -115,7 +115,7 @@ int handler_sign_tx(buffer_t *cdata, uint8_t chunk, bool more) {
                 return io_send_sw(SW_BAD_STATE);
             }
 
-end:
+        end:
             if (error != CX_OK) {
                 PRINTF("ERROR %x \n", error);
                 return -1;
