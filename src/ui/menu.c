@@ -119,16 +119,63 @@ static void ui_menu_about() {
 static const char* const info_types[] = {"Version", DISPLAYABLE_APPNAME};
 static const char* const info_contents[] = {APPVERSION, "(c) 2021 COZ Inc"};
 
+static const nbgl_contentInfoList_t infoList = {
+    .nbInfos = 2,
+    .infoTypes = info_types,
+    .infoContents = info_contents,
+};
+
 static void quit_app_callback(void) {
     os_sched_exit(-1);
 }
 
-#define NB_SETTINGS_SWITCHES 1
-static nbgl_layoutSwitch_t G_switches[NB_SETTINGS_SWITCHES];
+// Settings
 
+#define SETTING_CONTENTS_NB 1
+#define SETTINGS_SWITCHES_NB 1
 enum {
     SWITCH_CONTRACT_DATA_SET_TOKEN = FIRST_USER_TOKEN,
 };
+
+static nbgl_contentSwitch_t switches[SETTINGS_SWITCHES_NB] = {0};
+
+static void controls_callback(int token, uint8_t index, int page) {
+
+    UNUSED(page);
+    UNUSED(index);
+
+    bool new_setting;
+
+    switch (token) {
+        case SWITCH_CONTRACT_DATA_SET_TOKEN:
+            switches[0].initState = !(switches[0].initState);
+            new_setting = (switches[0].initState == ON_STATE);
+            nvm_write((void*) &N_storage.scriptsAllowed, &new_setting, 1);
+            break;
+        default:
+            PRINTF("Should not happen !");
+            break;
+    }
+}
+
+static const nbgl_content_t contents[SETTING_CONTENTS_NB] = {
+    {
+        .type = SWITCHES_LIST,
+        .content.switchesList.nbSwitches = SETTINGS_SWITCHES_NB,
+        .content.switchesList.switches = switches,
+        .contentActionCallback = controls_callback
+    }
+};
+
+static const nbgl_genericContents_t settingContents = {
+    .callbackCallNeeded = false,
+    .contentsList = contents,
+    .nbContents = 1
+};
+
+#define NB_SETTINGS_SWITCHES 1
+static nbgl_layoutSwitch_t G_switches[NB_SETTINGS_SWITCHES];
+
 
 static bool settings_nav_callback(uint8_t page, nbgl_pageContent_t* content) {
     if (page == 0) {
@@ -185,7 +232,25 @@ void ui_menu_settings(void) {
 }
 
 static void ui_menu_main_nbgl(void) {
-    nbgl_useCaseHome(DISPLAYABLE_APPNAME, &C_icon_neo_n3_64x64, NULL, true, ui_menu_settings, quit_app_callback);
+    //nbgl_useCaseHome(DISPLAYABLE_APPNAME, &C_icon_neo_n3_64x64, NULL, true, ui_menu_settings, quit_app_callback);
+    switches[0].text = "Contract scripts";
+    switches[0].subText = "Allow contract scripts";
+    switches[0].token = SWITCH_CONTRACT_DATA_SET_TOKEN;
+    switches[0].tuneId = TUNE_TAP_CASUAL;
+    if (N_storage.scriptsAllowed) {
+        switches[0].initState = ON_STATE;
+    } else {
+        switches[0].initState = OFF_STATE;
+    }
+
+    nbgl_useCaseHomeAndSettings(DISPLAYABLE_APPNAME, 
+                                &C_icon_neo_n3_64x64, 
+                                NULL, 
+                                INIT_HOME_PAGE, 
+                                &settingContents, 
+                                &infoList, 
+                                NULL, 
+                                quit_app_callback);
 }
 #endif
 
