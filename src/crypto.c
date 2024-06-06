@@ -81,7 +81,6 @@ int crypto_sign_tx() {
     memcpy(G_context.tx_info.raw_tx, (void *) &G_context.network_magic, 4);
     memcpy(G_context.tx_info.raw_tx + 4, G_context.tx_info.hash, 32);
 
-
     // Hash the data before signing
     cx_sha256_t msg_hash;
     cx_sha256_init(&msg_hash);
