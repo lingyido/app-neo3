@@ -33,6 +33,13 @@ def test_get_public_key_confirm_ok(backend, firmware, navigator, test_name):
                        NavInsID.USE_CASE_ADDRESS_CONFIRMATION_CONFIRM,
                        NavInsID.USE_CASE_STATUS_DISMISS]
             navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+        elif backend.firmware.device == "flex":
+            nav_ins = [NavInsID.SWIPE_CENTER_TO_LEFT,
+                       NavIns(NavInsID.TOUCH, (100,400)),
+                       NavInsID.USE_CASE_ADDRESS_CONFIRMATION_EXIT_QR,
+                       NavInsID.USE_CASE_ADDRESS_CONFIRMATION_CONFIRM,
+                       NavInsID.USE_CASE_STATUS_DISMISS]
+            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
 
     pub_key = backend.last_async_response.data
 
@@ -55,6 +62,12 @@ def test_get_public_key_confirm_refused(backend, firmware, navigator, test_name)
                        NavInsID.USE_CASE_ADDRESS_CONFIRMATION_CANCEL,
                        NavInsID.USE_CASE_STATUS_DISMISS]
             navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+        elif backend.firmware.device == "flex":
+            nav_ins = [NavInsID.SWIPE_CENTER_TO_LEFT,
+                       NavInsID.USE_CASE_ADDRESS_CONFIRMATION_CANCEL,
+                       NavInsID.USE_CASE_STATUS_DISMISS]
+            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+        
 
     rapdu = backend.last_async_response
     assert rapdu.status == 0x6985 # Deny error

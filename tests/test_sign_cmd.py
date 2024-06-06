@@ -80,6 +80,12 @@ def test_sign_tx(backend, firmware, navigator, test_name):
                                                       "Hold to sign",
                                                       ROOT_SCREENSHOT_PATH,
                                                       test_name)
+        elif backend.firmware.device == "flex":
+            navigator.navigate_until_text_and_compare(NavInsID.SWIPE_CENTER_TO_LEFT,
+                                                      [NavInsID.USE_CASE_REVIEW_CONFIRM, NavInsID.USE_CASE_STATUS_DISMISS],
+                                                      "Hold to sign",
+                                                      ROOT_SCREENSHOT_PATH,
+                                                      test_name)        
 
     der_sig = backend.last_async_response.data
 
@@ -150,6 +156,22 @@ def test_sign_vote_script_tx(backend, firmware, navigator, test_name):
             nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen approve?
             nav_ins.append(NavInsID.USE_CASE_REVIEW_PREVIOUS) # screen 3
             nav_ins.append(NavInsID.USE_CASE_REVIEW_TAP)      # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
+            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_CONFIRM)
+
+            navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name, nav_ins)
+        elif backend.firmware.device == "flex":
+            # Navigate a bit through rejection screens before confirming
+            nav_ins = []
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
+            nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen 0
+            nav_ins.append(NavInsID.SWIPE_CENTER_TO_LEFT)      # screen 1
+            nav_ins.append(NavInsID.SWIPE_CENTER_TO_LEFT)      # screen 2
+            nav_ins.append(NavInsID.SWIPE_CENTER_TO_LEFT)      # screen 3
+            nav_ins.append(NavInsID.SWIPE_CENTER_TO_LEFT)      # screen approve?
+            nav_ins.append(NavInsID.USE_CASE_REVIEW_PREVIOUS) # screen 3
+            nav_ins.append(NavInsID.SWIPE_CENTER_TO_LEFT)      # screen approve?
             nav_ins.append(NavInsID.USE_CASE_REVIEW_REJECT)   # screen reject?
             nav_ins.append(NavInsID.USE_CASE_CHOICE_REJECT)   # screen approve?
             nav_ins.append(NavInsID.USE_CASE_REVIEW_CONFIRM)
