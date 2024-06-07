@@ -19,7 +19,7 @@ from ragger.navigator import NavInsID
 
 ROOT_SCREENSHOT_PATH = Path(__file__).parent.resolve()
 
-def test_sign_tx(backend, firmware, navigator, test_name):
+def test_sign_tx(backend, scenario_navigator):
     client = Neo_n3_Command(backend)
 
     bip44_path: str = "m/44'/888'/0'/0/0"
@@ -66,26 +66,7 @@ def test_sign_tx(backend, firmware, navigator, test_name):
     with client.sign_tx(bip44_path=bip44_path,
                         transaction=tx,
                         network_magic=magic):
-
-        if backend.firmware.device.startswith("nano"):
-            navigator.navigate_until_text_and_compare(navigate_instruction=NavInsID.RIGHT_CLICK,
-                                                      validation_instructions=[NavInsID.BOTH_CLICK],
-                                                      text="Approve",
-                                                      path=ROOT_SCREENSHOT_PATH,
-                                                      test_case_name=test_name)
-
-        elif backend.firmware.device == "stax":
-            navigator.navigate_until_text_and_compare(NavInsID.USE_CASE_REVIEW_TAP,
-                                                      [NavInsID.USE_CASE_REVIEW_CONFIRM, NavInsID.USE_CASE_STATUS_DISMISS],
-                                                      "Hold to sign",
-                                                      ROOT_SCREENSHOT_PATH,
-                                                      test_name)
-        elif backend.firmware.device == "flex":
-            navigator.navigate_until_text_and_compare(NavInsID.SWIPE_CENTER_TO_LEFT,
-                                                      [NavInsID.USE_CASE_REVIEW_CONFIRM, NavInsID.USE_CASE_STATUS_DISMISS],
-                                                      "Hold to sign",
-                                                      ROOT_SCREENSHOT_PATH,
-                                                      test_name)        
+        scenario_navigator.review_approve()        
 
     der_sig = backend.last_async_response.data
 

@@ -61,6 +61,7 @@ def test_arbitrary_scripts_allowed(backend, firmware, navigator, test_name):
                                                   screen_change_before_first_instruction=False)
     elif backend.firmware.device == "stax" or backend.firmware.device == "flex":
         nav_ins = [NavInsID.USE_CASE_HOME_SETTINGS,
+
                    NavIns(NavInsID.TOUCH, (350,115)),
                    NavInsID.USE_CASE_SETTINGS_MULTI_PAGE_EXIT]
         navigator.navigate_and_compare(ROOT_SCREENSHOT_PATH, test_name + "_0", nav_ins, screen_change_before_first_instruction=False)
@@ -75,14 +76,7 @@ def test_arbitrary_scripts_allowed(backend, firmware, navigator, test_name):
                                                       text="Approve",
                                                       path=ROOT_SCREENSHOT_PATH,
                                                       test_case_name=test_name + "_1")
-
-        elif backend.firmware.device == "stax":
-            navigator.navigate_until_text_and_compare(NavInsID.USE_CASE_REVIEW_TAP,
-                                                      [NavInsID.USE_CASE_REVIEW_CONFIRM, NavInsID.USE_CASE_STATUS_DISMISS],
-                                                      "Hold to sign",
-                                                      ROOT_SCREENSHOT_PATH,
-                                                      test_name + "_1")
-        elif backend.firmware.device == "flex":
+        elif backend.firmware.device == "flex" or backend.firmware.device == "stax":
             navigator.navigate_until_text_and_compare(NavInsID.SWIPE_CENTER_TO_LEFT,
                                                       [NavInsID.USE_CASE_REVIEW_CONFIRM, NavInsID.USE_CASE_STATUS_DISMISS],
                                                       "Hold to sign",

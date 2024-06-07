@@ -38,9 +38,9 @@ APPVERSION   = "$(APPVERSION_M).$(APPVERSION_N).$(APPVERSION_P)"
 
 ifeq ($(TARGET_NAME),TARGET_NANOS)
     ICONNAME=icons/nanos_app_neo.gif
-else ifeq ($(TARGET_NAME),$(filter $(TARGET_NAME), TARGET_STAX))
+else ifeq ($(TARGET_NAME),TARGET_STAX)
     ICONNAME=icons/stax_app_neo.gif
-else ifeq ($(TARGET_NAME),$(filter $(TARGET_NAME), TARGET_FLEX))
+else ifeq ($(TARGET_NAME),TARGET_FLEX)
     ICONNAME=icons/flex_app_neo.gif
 else
     ICONNAME=icons/nanox_app_neo.gif

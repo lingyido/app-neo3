@@ -265,7 +265,7 @@ void start_sign_tx_ui(void) {
             &content,
             &C_icon_neo_n3_64x64,
             review_title,
-            "",
+            NULL,
             review_final_long_press_text,
             review_final_callback);
     }

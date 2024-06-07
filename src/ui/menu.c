@@ -116,11 +116,13 @@ static void ui_menu_about() {
 
 #else
 
-static const char* const info_types[] = {"Version", DISPLAYABLE_APPNAME};
-static const char* const info_contents[] = {APPVERSION, "(c) 2021 COZ Inc"};
+#define INFO_CONTENT_SIZE 2
+
+static const char* const info_types[INFO_CONTENT_SIZE] = {"Version", DISPLAYABLE_APPNAME};
+static const char* const info_contents[INFO_CONTENT_SIZE] = {APPVERSION, "(c) 2021 COZ Inc"};
 
 static const nbgl_contentInfoList_t infoList = {
-    .nbInfos = 2,
+    .nbInfos = INFO_CONTENT_SIZE,
     .infoTypes = info_types,
     .infoContents = info_contents,
 };
@@ -196,24 +198,7 @@ void ui_menu_settings(bool confirm) {
 
 
 static void ui_menu_main_nbgl(void) {
-    switches[0].text = "Contract scripts";
-    switches[0].subText = "Allow contract scripts";
-    switches[0].token = SWITCH_CONTRACT_DATA_SET_TOKEN;
-    switches[0].tuneId = TUNE_TAP_CASUAL;
-    if (N_storage.scriptsAllowed) {
-        switches[0].initState = ON_STATE;
-    } else {
-        switches[0].initState = OFF_STATE;
-    }
-
-    nbgl_useCaseHomeAndSettings(DISPLAYABLE_APPNAME, 
-                                &C_icon_neo_n3_64x64, 
-                                NULL, 
-                                INIT_HOME_PAGE, 
-                                &settingContents, 
-                                &infoList, 
-                                NULL, 
-                                quit_app_callback);
+    ui_menu_settings(false);
 }
 #endif
 

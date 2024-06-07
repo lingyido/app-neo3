@@ -87,7 +87,7 @@ int crypto_sign_tx() {
     CX_CHECK(cx_hash_no_throw((cx_hash_t *) &msg_hash,
                               CX_LAST /*mode*/,
                               G_context.tx_info.raw_tx /* data in */,
-                              36 /* data in len */,
+                              sizeof(G_context.network_magic) + sizeof(G_context.tx_info.hash) /* data in len */,
                               G_context.tx_info.hash /* hash out*/,
                               sizeof(G_context.tx_info.hash) /* hash out len */));
 
