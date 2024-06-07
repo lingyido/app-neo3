@@ -84,24 +84,6 @@ UX_FLOW(ux_get_pub_key_pubkey_flow,
 
 #else
 
-static void address_verification_cancelled(void) {
-    ui_action_validate_pubkey(false, false);
-    nbgl_useCaseStatus("Address verification\ncancelled", false, ui_menu_main);
-}
-
-static void callback_match(bool match) {
-    if (match) {
-        ui_action_validate_pubkey(true, false);
-        nbgl_useCaseStatus("ADDRESS\nVERIFIED", true, ui_menu_main);
-    } else {
-        address_verification_cancelled();
-    }
-}
-
-static void display_addr(void) {
-    nbgl_useCaseAddressConfirmation(g_address, callback_match);
-}
-
 static void review_choice(bool confirm) {
      ui_action_validate_pubkey(confirm, false);
     if (confirm) {
@@ -112,13 +94,6 @@ static void review_choice(bool confirm) {
 }
 
 static void ui_get_public_key_nbgl(void) {
-    /*nbgl_useCaseReviewStart(&C_icon_neo_n3_64x64,
-                            "Verify " APPNAME "\naddress",
-                            NULL,
-                            "Cancel",
-                            display_addr,
-                            address_verification_cancelled);*/
-
     nbgl_useCaseAddressReview(
         g_address,
         NULL,
