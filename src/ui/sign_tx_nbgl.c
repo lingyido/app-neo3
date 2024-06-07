@@ -161,17 +161,13 @@ static void create_transaction_flow(void) {
 }
 
 
-static void rejectChoice(void) {
-    ui_action_validate_transaction(false, false);
-    nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
-}
-
 static void review_final_callback(bool confirmed) {
     if (confirmed) {
         ui_action_validate_transaction(true, false);
         nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_SIGNED, ui_menu_main);
     } else {
-        nbgl_useCaseConfirm("Reject transaction?", NULL, "Yes, reject", "Go back to transaction", rejectChoice);
+        ui_action_validate_transaction(false, false);
+        nbgl_useCaseReviewStatus(STATUS_TYPE_TRANSACTION_REJECTED, ui_menu_main);
     }
 }
 
