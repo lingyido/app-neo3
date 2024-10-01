@@ -35,6 +35,7 @@ static void ui_menu_about();
 
 static void display_settings(const ux_flow_step_t* const start_step);
 static void switch_settings_contract_scripts(void);
+static void switch_settings_display_script(void);
 
 UX_STEP_NOCB(ux_menu_ready_step, pn, {&C_badge_neo, "Wake up NEO.."});
 UX_STEP_NOCB(ux_menu_version_step, bn, {"Version", APPVERSION});
@@ -66,6 +67,15 @@ UX_STEP_CB(
         .text = strings.scriptsAllowed
     });
 
+UX_STEP_CB(
+    ux_settings_display_script,
+    bnnn_paging,
+    switch_settings_display_script(),
+    {
+        .title = "Display script hash",
+        .text = strings.showScriptHash
+    });
+
 #else
 UX_STEP_CB(
     ux_settings_contract_scripts,
@@ -76,6 +86,17 @@ UX_STEP_CB(
         "Allow contract scripts",
         "in transactions",
         strings.scriptsAllowed
+    });
+
+UX_STEP_CB(
+    ux_settings_display_script,
+    bnnn,
+    switch_settings_display_script(),
+    {
+        "Transaction script",
+        "Display script hash",
+        "in transactions",
+        strings.showScriptHash
     });
 #endif
 
@@ -89,10 +110,11 @@ UX_STEP_CB(
     });
 
 // clang-format on
-UX_FLOW(ux_settings_flow, &ux_settings_contract_scripts, &ux_settings_back_step);
+UX_FLOW(ux_settings_flow, &ux_settings_contract_scripts, &ux_settings_display_script, &ux_settings_back_step);
 
 static void display_settings(const ux_flow_step_t* const start_step) {
     strlcpy(strings.scriptsAllowed, (N_storage.scriptsAllowed ? "Allowed" : "NOT Allowed"), 12);
+    strlcpy(strings.showScriptHash, (N_storage.showScriptHash ? "Show" : "Hide"), 6);
     ux_flow_init(0, ux_settings_flow, start_step);
 }
 
@@ -100,6 +122,13 @@ static void switch_settings_contract_scripts() {
     uint8_t value = (N_storage.scriptsAllowed ? 0 : 1);
     nvm_write((void*) &N_storage.scriptsAllowed, (void*) &value, sizeof(uint8_t));
     display_settings(&ux_settings_contract_scripts);
+}
+
+static void switch_settings_display_script() {
+    uint8_t value = (N_storage.showScriptHash ? 0 : 1);
+    nvm_write((void*) &N_storage.showScriptHash, (void*) &value, sizeof(uint8_t));
+    display_settings(&ux_settings_display_script);
+
 }
 
 UX_STEP_NOCB(ux_menu_info_step, bn, {"NEO N3 App", "(c) 2021 COZ Inc"});
